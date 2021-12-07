@@ -9,7 +9,7 @@ from main_app.api import views
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
-    # path('', include(router.urls)),
+    path('', views.UserViewSet.as_view()),
     path('registration/', views.registration_view),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]

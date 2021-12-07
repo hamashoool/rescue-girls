@@ -1,19 +1,22 @@
 from rest_framework import viewsets
 from rest_framework import permissions
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
 from main_app.api.serializers import UserSerializer, RegistrationSerializer
 from main_app.models import User
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(ListAPIView):
     """
     API endpoint that allows users to be viewed or edited.
     """
-    queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return User.objects.all().order_by('-date_joined')
 
 
 @api_view(['POST'])
