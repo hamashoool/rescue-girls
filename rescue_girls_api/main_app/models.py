@@ -11,6 +11,8 @@ class User(AbstractUser):
     is_girl = models.BooleanField(default=False)
     is_savior = models.BooleanField(default=False)
 
+    # USERNAME_FIELD = 'email'
+
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
