@@ -27,7 +27,7 @@ function WelcomeScreen(props) {
                     </View>
                 </TouchableHighlight>
 
-                <TouchableHighlight style={styles.FullWidth} onPress={() => console.log('Register')}>
+                <TouchableHighlight style={styles.FullWidth} onPress={() => navigation.navigate('Registration')}>
                     <View style={styles.RegistrationButton}>
                         <Text style={styles.RegisterText}>Register</Text>
                     </View>
