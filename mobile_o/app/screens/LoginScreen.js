@@ -10,7 +10,7 @@ import {
     View
 } from 'react-native';
 
-function RegistrationScreen(props) {
+function LoginScreen(props) {
 
     let navigation = props.navigation;
     return (
@@ -116,4 +116,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default RegistrationScreen;
+export default LoginScreen;
