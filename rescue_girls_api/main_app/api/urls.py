@@ -7,6 +7,7 @@ from main_app.api.views import MyTokenObtainPairView
 
 urlpatterns = [
     path('', views.UserViewSet.as_view(), name="api"),
+    path('user/', views.get_user),
     path('login/', views.login_view),
     path('registration/', views.registration_view),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
     ImageBackground,
     Platform,
@@ -9,10 +9,17 @@ import {
     TextInput, TouchableHighlight,
     View
 } from 'react-native';
+import AwesomeAlert from "react-native-awesome-alerts";
+import * as SecureStore from "expo-secure-store";
+import {AuthContext} from "../components/context";
 
 function LoginScreen(props) {
-
+    const [Username, setUsername] = useState('')
+    const [Password, setPassword] = useState('')
     let navigation = props.navigation;
+
+    const { signIn } = React.useContext(AuthContext);
+
     return (
         <SafeAreaView style={styles.container}>
             <ImageBackground blurRadius={6} source={require('../assets/bg-2.jpg')} style={styles.background}>
@@ -25,6 +32,7 @@ function LoginScreen(props) {
                         style={[styles.Username, styles.InputCommon]}
                         placeholder="Username"
                         placeholderTextColor="#c0c0c0"
+                        onChangeText={setUsername}
                     />
 
                     <TextInput
@@ -32,9 +40,12 @@ function LoginScreen(props) {
                         placeholder="Password"
                         placeholderTextColor="#c0c0c0"
                         secureTextEntry={true}
+                        onChangeText={setPassword}
                     />
 
-                    <TouchableHighlight style={styles.LoginContainer} onPress={() => console.log('Logged In')}>
+                    <TouchableHighlight style={styles.LoginContainer} onPress={() => {
+                        signIn(Username, Password)
+                    }}>
                         <View style={styles.LoginButton}>
                             <Text style={styles.LoginText}>Login</Text>
                         </View>
@@ -44,6 +55,25 @@ function LoginScreen(props) {
                         style={styles.RegisterLink}
                         onPress={() => navigation.navigate('Registration')}
                     >Don't have an account?</Text>
+                    {/*<AwesomeAlert*/}
+                    {/*    show={true}*/}
+                    {/*    showProgress={false}*/}
+                    {/*    title="AwesomeAlert"*/}
+                    {/*    message="I have a message for you!"*/}
+                    {/*    closeOnTouchOutside={true}*/}
+                    {/*    closeOnHardwareBackPress={false}*/}
+                    {/*    showCancelButton={true}*/}
+                    {/*    showConfirmButton={true}*/}
+                    {/*    cancelText="No, cancel"*/}
+                    {/*    confirmText="Yes, delete it"*/}
+                    {/*    confirmButtonColor="#DD6B55"*/}
+                    {/*    onCancelPressed={() => {*/}
+                    {/*        this.hideAlert();*/}
+                    {/*    }}*/}
+                    {/*    onConfirmPressed={() => {*/}
+                    {/*        this.hideAlert();*/}
+                    {/*    }}*/}
+                    {/*/>*/}
                 </View>
             </ImageBackground>
         </SafeAreaView>
@@ -114,6 +144,5 @@ const styles = StyleSheet.create({
         fontFamily: 'Playball_400Regular'
     },
 });
-
 
 export default LoginScreen;

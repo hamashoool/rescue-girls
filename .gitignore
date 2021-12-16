@@ -2,3 +2,4 @@
 /rescue_girls_api/main_app/migrations
 /rescue_girls_api/db.sqlite3
 .idea
+*.pyc

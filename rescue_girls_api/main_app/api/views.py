@@ -13,6 +13,22 @@ from main_app.api.serializers import UserSerializer, RegistrationSerializer
 from main_app.models import User
 
 
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Add custom claims
+        token['username'] = user.username
+        # ...
+
+        return token
+
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
+
 class UserViewSet(ListAPIView):
     """
     API endpoint that allows users to be viewed or edited.
@@ -60,25 +76,21 @@ def login_view(request):
             user = User.objects.get(username=username)
             token = Token.objects.get(user=user.id)
             data['response'] = "Login Successfully"
-            resp = Response(data)
-            resp['Authorization'] = f'Token {token.key}'
-            return resp
+            data['name'] = user.get_full_name()
+            data['token'] = token.key
+            return Response(data)
         else:
             data['error'] = "Invalid Info"
         return Response(data)
 
 
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-
-        # Add custom claims
-        token['username'] = user.username
-        # ...
-
-        return token
-
-
-class MyTokenObtainPairView(TokenObtainPairView):
-    serializer_class = MyTokenObtainPairSerializer
+@api_view(['POST'])
+@permission_classes((permissions.IsAuthenticated,))
+def get_user(request):
+    if request.method == 'POST':
+        token = Token.objects.get(key=request.data['token'])
+        user = token.user
+        data = {
+            'name': user.get_full_name(),
+        }
+        return Response(data)
