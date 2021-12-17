@@ -8,20 +8,25 @@ import RegistrationScreenOne, {RegistrationScreenThree, RegistrationScreenTwo} f
 import {createSharedElementStackNavigator} from "react-navigation-shared-element";
 import {CardStyleInterpolators} from '@react-navigation/stack';
 import HomeScreen from "./app/screens/HomeScreen";
-import {AuthContext, TokenContext} from "./app/components/context";
+import {AuthContext, TokenContext, LoginValidationContext} from "./app/components/context";
 import * as SecureStore from "expo-secure-store";
 
 const Stack = createSharedElementStackNavigator();
 
 export default function App() {
-    const getUserUrl = 'http://192.168.0.90:8000/api/user/'
-    const loginUrl = 'http://192.168.0.90:8000/api/login/';
+    const urls = {
+        registrationUrl: 'http://192.168.0.90:8000/api/registration/',
+        loginUrl: 'http://192.168.0.90:8000/api/login/',
+        apiUrl: 'http://192.168.0.90:8000/api/',
+        getUserUrl: 'http://192.168.0.90:8000/api/user/'
+    };
     let [fontLoaded, error] = useFonts({Playball_400Regular});
     let [Token, setToken] = useState(null);
     let [userInfo, setUserInfo] = useState({
         name: null,
         token: null,
-    })
+    });
+    const [loginValid, setLoginValid] = useState(true);
 
     const initialLoginState = {
         userToken: null,
@@ -56,7 +61,7 @@ export default function App() {
 
     const authContext = React.useMemo(() => ({
         signIn: async (username, pass) => {
-            let response = fetch(loginUrl, {
+            let response = fetch(urls.loginUrl, {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
@@ -68,21 +73,22 @@ export default function App() {
                 })
             }).then((response) => response.json())
                 .then(async (json) => {
-                    // console.log(json);
                     if (json.error) {
-                        alert('Invalid Login Information.');
-                        console.log(json);
+                        setLoginValid(false);
                     }
-                    if (json.name) {
+                    if (json.username) {
                         try {
                             await SecureStore.setItemAsync('userToken', json.token);
+                            await SecureStore.setItemAsync('userName', json.username);
+                            await SecureStore.setItemAsync('Name', json.name);
                             setUserInfo(prevState => {
-                                return{
+                                return {
                                     ...prevState,
-                                    name: json.name,
+                                    name: json.username,
                                     token: json.token,
                                 };
                             });
+                            setLoginValid(true);
                             dispatch({type: 'LOGIN', token: json.token});
                         } catch (error) {
                             console.log(error);
@@ -101,8 +107,62 @@ export default function App() {
             }
             dispatch({type: 'LOGOUT'})
         },
-        signUp: () => {
-
+        signUp: (PersonalInfo, LoginInfo, UserType) => {
+            let is_girl = false;
+            let is_savior = false;
+            if (UserType === 'girl') {
+                is_girl = true;
+            }
+            if (UserType === 'savior') {
+                is_savior = true;
+            }
+            if (UserType === '') {
+                return alert('Choose User Type.')
+            }
+            if (is_girl !== false || is_savior !== false) {
+                fetch(urls.registrationUrl, {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: PersonalInfo.email,
+                        username: LoginInfo.username,
+                        first_name: PersonalInfo.firstName,
+                        last_name: PersonalInfo.lastName,
+                        password: LoginInfo.password,
+                        password2: LoginInfo.password2,
+                        is_girl: is_girl,
+                        is_savior: is_savior,
+                    })
+                }).then(response => response.json())
+                    .then(async json => {
+                        if (!json.response) {
+                            alert('Invalid Registration Information.');
+                            console.log(json);
+                        }
+                        if (json.Token) {
+                            try {
+                                await SecureStore.setItemAsync('userToken', json.Token);
+                                await SecureStore.setItemAsync('userName', json.username);
+                                setUserInfo(prevState => {
+                                    return {
+                                        ...prevState,
+                                        name: json.username,
+                                        token: json.Token,
+                                    };
+                                });
+                                dispatch({type: 'REGISTER', token: json.Token});
+                            } catch (error) {
+                                console.log(error);
+                            }
+                        }
+                    });
+            }
+        },
+        closeError: () => {
+          setLoginValid(true);
         },
     }), []);
 
@@ -112,7 +172,7 @@ export default function App() {
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': 'Token '+userToken
+                'Authorization': 'Token ' + userToken
             },
             body: JSON.stringify({
                 token: userToken,
@@ -142,16 +202,26 @@ export default function App() {
 
     useEffect(async () => {
         let userToken;
+        let userName;
         userToken = null;
+        userName = null;
         try {
             userToken = await SecureStore.getItemAsync('userToken');
+            userName = await SecureStore.getItemAsync('userName');
+            setUserInfo(prevState => {
+                return {
+                    ...prevState,
+                    name: userName,
+                    token: userToken,
+                };
+            });
         } catch (error) {
             console.log(error);
         }
 
-        if (userToken !== null){
-            getUser(userToken);
-        }
+        // if (userToken !== null){
+        //     getUser(userToken);
+        // }
 
         dispatch({type: 'RETRIEVE_TOKEN', token: userToken});
     }, []);
@@ -163,33 +233,36 @@ export default function App() {
     return (
         <AuthContext.Provider value={authContext}>
             {loginState.userToken == null ? (
-                    <NavigationContainer>
-                        <Stack.Navigator>
-                            <Stack.Screen options={{headerShown: false}} name="Welcome" component={WelcomeScreen}/>
+                    <LoginValidationContext.Provider value={loginValid}>
+                        <NavigationContainer>
+                            <Stack.Navigator>
+                                <Stack.Screen options={{headerShown: false}} name="Welcome" component={WelcomeScreen}/>
 
-                            <Stack.Screen options={{
-                                headerShown: false,
-                                cardStyleInterpolator: CardStyleInterpolators.forBottomSheetAndroid
-                            }} name="Login" component={LoginScreen}/>
+                                <Stack.Screen options={{
+                                    headerShown: false,
+                                    cardStyleInterpolator: CardStyleInterpolators.forBottomSheetAndroid
+                                }} name="Login" component={LoginScreen}/>
 
-                            <Stack.Screen options={{
-                                headerShown: false,
-                                cardStyleInterpolator: CardStyleInterpolators.forBottomSheetAndroid
-                            }} name="Registration" component={RegistrationScreenOne}/>
 
-                            <Stack.Screen options={{
-                                headerShown: false,
-                                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
-                            }} name="RegistrationTwo" component={RegistrationScreenTwo}/>
+                                <Stack.Screen options={{
+                                    headerShown: false,
+                                    cardStyleInterpolator: CardStyleInterpolators.forBottomSheetAndroid
+                                }} name="Registration" component={RegistrationScreenOne}/>
 
-                            <Stack.Screen options={{
-                                headerShown: false,
-                                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
-                            }} name="RegistrationThree" component={RegistrationScreenThree}/>
+                                <Stack.Screen options={{
+                                    headerShown: false,
+                                    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
+                                }} name="RegistrationTwo" component={RegistrationScreenTwo}/>
 
-                        </Stack.Navigator>
+                                <Stack.Screen options={{
+                                    headerShown: false,
+                                    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
+                                }} name="RegistrationThree" component={RegistrationScreenThree}/>
 
-                    </NavigationContainer>
+                            </Stack.Navigator>
+
+                        </NavigationContainer>
+                    </LoginValidationContext.Provider>
                 ) :
                 <TokenContext.Provider value={userInfo}>
                     <NavigationContainer>

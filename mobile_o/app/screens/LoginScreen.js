@@ -11,69 +11,66 @@ import {
 } from 'react-native';
 import AwesomeAlert from "react-native-awesome-alerts";
 import * as SecureStore from "expo-secure-store";
-import {AuthContext} from "../components/context";
+import {AuthContext, LoginValidationContext} from "../components/context";
+import {FontAwesome} from "@expo/vector-icons";
+import * as Animatable from 'react-native-animatable';
 
 function LoginScreen(props) {
-    const [Username, setUsername] = useState('')
-    const [Password, setPassword] = useState('')
     let navigation = props.navigation;
-
-    const { signIn } = React.useContext(AuthContext);
+    const [Username, setUsername] = useState('');
+    const [Password, setPassword] = useState('');
+    const {signIn, closeError} = React.useContext(AuthContext);
+    const loginValid = React.useContext(LoginValidationContext);
 
     return (
         <SafeAreaView style={styles.container}>
-            <ImageBackground blurRadius={6} source={require('../assets/bg-2.jpg')} style={styles.background}>
-                <View style={styles.Content}>
+            <StatusBar barStyle="light-content" backgroundColor="#000" />
+            <ImageBackground blurRadius={6} source={require('../assets/black1.jpg')} style={styles.background}>
+                <View style={styles.HeaderS}>
                     <Text style={styles.LogoText}>Rescue Girls</Text>
+                </View>
+                <View style={styles.Footer}>
+                    <View style={styles.Content}>
+                        <Text style={styles.LoginTitle}>Login</Text>
 
-                    <Text style={styles.LoginTitle}>Login</Text>
+                        <TextInput
+                            style={[styles.Username, styles.InputCommon]}
+                            placeholder="Username"
+                            placeholderTextColor="#c0c0c0"
+                            onChangeText={setUsername}
+                        />
 
-                    <TextInput
-                        style={[styles.Username, styles.InputCommon]}
-                        placeholder="Username"
-                        placeholderTextColor="#c0c0c0"
-                        onChangeText={setUsername}
-                    />
+                        <TextInput
+                            style={[styles.Password, styles.InputCommon]}
+                            placeholder="Password"
+                            placeholderTextColor="#c0c0c0"
+                            secureTextEntry={true}
+                            onChangeText={setPassword}
+                        />
+                        {loginValid ? null :
+                            <Animatable.View animation="bounceIn" style={styles.ErrorView}>
+                                <View style={styles.ErrorInner}>
+                                    <Text style={styles.ErrorText}>Invalid Login Information.</Text>
+                                    <Text style={styles.CloseError} onPress={() => {closeError()}}>
+                                        <FontAwesome name="close" size={24} color="rgb(255,37,37)"/>
+                                    </Text>
+                                </View>
+                            </Animatable.View>
+                        }
 
-                    <TextInput
-                        style={[styles.Password, styles.InputCommon]}
-                        placeholder="Password"
-                        placeholderTextColor="#c0c0c0"
-                        secureTextEntry={true}
-                        onChangeText={setPassword}
-                    />
+                        <TouchableHighlight style={styles.LoginContainer} onPress={() => {
+                            signIn(Username, Password)
+                        }}>
+                            <View style={styles.LoginButton}>
+                                <Text style={styles.LoginText}>Login</Text>
+                            </View>
+                        </TouchableHighlight>
 
-                    <TouchableHighlight style={styles.LoginContainer} onPress={() => {
-                        signIn(Username, Password)
-                    }}>
-                        <View style={styles.LoginButton}>
-                            <Text style={styles.LoginText}>Login</Text>
-                        </View>
-                    </TouchableHighlight>
-
-                    <Text
-                        style={styles.RegisterLink}
-                        onPress={() => navigation.navigate('Registration')}
-                    >Don't have an account?</Text>
-                    {/*<AwesomeAlert*/}
-                    {/*    show={true}*/}
-                    {/*    showProgress={false}*/}
-                    {/*    title="AwesomeAlert"*/}
-                    {/*    message="I have a message for you!"*/}
-                    {/*    closeOnTouchOutside={true}*/}
-                    {/*    closeOnHardwareBackPress={false}*/}
-                    {/*    showCancelButton={true}*/}
-                    {/*    showConfirmButton={true}*/}
-                    {/*    cancelText="No, cancel"*/}
-                    {/*    confirmText="Yes, delete it"*/}
-                    {/*    confirmButtonColor="#DD6B55"*/}
-                    {/*    onCancelPressed={() => {*/}
-                    {/*        this.hideAlert();*/}
-                    {/*    }}*/}
-                    {/*    onConfirmPressed={() => {*/}
-                    {/*        this.hideAlert();*/}
-                    {/*    }}*/}
-                    {/*/>*/}
+                        <Text
+                            style={styles.RegisterLink}
+                            onPress={() => navigation.navigate('Registration')}
+                        >Don't have an account?</Text>
+                    </View>
                 </View>
             </ImageBackground>
         </SafeAreaView>
@@ -84,58 +81,86 @@ const styles = StyleSheet.create({
     background: {
         flex: 1,
         justifyContent: "center",
-        // alignItems: 'center',
     },
     Content: {},
     container: {
         flex: 1,
-        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
+        // paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
     },
+    CloseError: {
+        position: 'absolute',
+        right: '4%',
+        top: '30%'
+    },
+    ErrorView: {
+        justifyContent: 'center',
+        alignItems: "center"
+    },
+    ErrorInner:{
+        borderRadius: 5,
+        borderColor: 'rgb(255,37,37)',
+        borderWidth: 2,
+        paddingTop: '2%',
+        paddingBottom: '2%',
+        paddingRight: '10%',
+        paddingLeft: '10%',
+        backgroundColor: 'rgba(119,0,0,0.35)',
+    },
+    ErrorText: {
+        fontSize: 19,
+        color: 'rgb(255,37,37)',
+
+    },
+    Footer: {
+        flex: 2,
+    },
+    HeaderS: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+
     InputCommon: {
-        height: 60,
+        height: "14%",
         margin: 12,
         borderWidth: 1,
         padding: 10,
         borderRadius: 5,
-        backgroundColor: 'rgba(5,15,26,0.6)',
+        backgroundColor: 'rgb(51,49,49)',
         color: '#c0c0c0',
         fontSize: 20
     },
     LoginButton: {
-        height: 60,
-        backgroundColor: '#0e3b60',
+        height: 50,
+        backgroundColor: '#2ADBB7',
         justifyContent: 'center', //Centered horizontally
         alignItems: 'center', //Centered vertically
         borderRadius: 50
     },
     LoginContainer: {
-        margin: 12,
+        margin: 10,
         borderRadius: 50
     },
     LoginText: {
-        fontSize: 20,
-        color: '#fff'
+        fontSize: 25,
+        color: '#09614F'
     },
     LogoText: {
         width: '100%',
-        height: 100,
-        // position: 'absolute',
-        top: -70,
         fontFamily: 'Playball_400Regular',
         fontSize: 60,
         textAlign: "center",
-        color: '#fff'
+        color: '#4AFFDB'
     },
     LoginTitle: {
         marginBottom: 20,
         fontSize: 40,
         textAlign: "center",
-        color: '#fff'
+        color: '#4AFFDB'
     },
     Username: {},
     Password: {},
     RegisterLink: {
-        color: '#fff',
+        color: '#DB592A',
         fontSize: 20,
         textAlign: 'center',
         marginTop: 20

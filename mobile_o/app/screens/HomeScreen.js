@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, StyleSheet, Text, View} from 'react-native';
+import {Button, SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import {AuthContext, TokenContext} from "../components/context";
 
 function HomeScreen(props) {
@@ -7,12 +7,12 @@ function HomeScreen(props) {
     const userInfo = React.useContext(TokenContext);
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <Button title={'sign out'} onPress={()=>{signOut()}}/>
             <Text>
-                Hello {userInfo.name}, your api token is: {userInfo.token}
+                Hello @{userInfo.name}, your api token is: {userInfo.token}
             </Text>
-        </View>
+        </SafeAreaView>
     );
 }
 

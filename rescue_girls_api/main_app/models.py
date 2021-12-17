@@ -7,7 +7,7 @@ from rest_framework.authtoken.models import Token
 
 
 class User(AbstractUser):
-    email = models.EmailField(unique=True, blank=True, null=True)
+    email = models.EmailField(unique=True)
     is_girl = models.BooleanField(default=False)
     is_savior = models.BooleanField(default=False)
 

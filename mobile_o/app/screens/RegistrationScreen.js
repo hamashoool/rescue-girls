@@ -10,8 +10,7 @@ import {
     View
 } from 'react-native';
 import {MaterialIcons, FontAwesome, MaterialCommunityIcons} from '@expo/vector-icons';
-
-let UserInfo = {};
+import {AuthContext} from "../components/context";
 
 function RegistrationScreenOne(props) {
     let navigation = props.navigation;
@@ -24,10 +23,12 @@ function RegistrationScreenOne(props) {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ImageBackground blurRadius={6} source={require('../assets/bg-2.jpg')} style={styles.background}>
-                <View style={styles.Content}>
+            <ImageBackground blurRadius={6} source={require('../assets/black1.jpg')} style={styles.background}>
+                <View style={styles.HeaderS}>
                     <Text style={styles.LogoText}>Rescue Girls</Text>
-
+                </View>
+                <View style={styles.Footer}>
+                    <View style={styles.Content}>
                     <Text style={styles.LoginTitle}>Sign Up</Text>
 
                     <TextInput
@@ -55,18 +56,17 @@ function RegistrationScreenOne(props) {
 
                     <TouchableHighlight style={styles.LoginContainer2}
                                         onPress={() => [navigation.navigate('RegistrationTwo', {info})]}>
-                        <View style={styles.LoginButton}>
+                        <View style={[styles.LoginButton, styles.InlineButtons]}>
                             <Text style={styles.LoginText}>Next</Text>
-                            <View style={styles.ArrowIcon}>
-                                <MaterialIcons name="arrow-forward" size={30} color="white"/>
-                            </View>
+                            <MaterialIcons name="arrow-forward" size={30} color="#09614F"/>
                         </View>
                     </TouchableHighlight>
 
                     <Text
-                        style={styles.RegisterLink}
+                        style={[styles.RegisterLink, styles.Linke]}
                         onPress={() => navigation.navigate('Login')}
                     >Already have an account?</Text>
+                </View>
                 </View>
             </ImageBackground>
         </SafeAreaView>
@@ -85,9 +85,12 @@ function RegistrationScreenTwo(props) {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ImageBackground blurRadius={6} source={require('../assets/bg-2.jpg')} style={styles.background}>
-                <View style={styles.Content}>
+            <ImageBackground blurRadius={6} source={require('../assets/black1.jpg')} style={styles.background}>
+                <View style={styles.HeaderS}>
                     <Text style={styles.LogoText}>Rescue Girls</Text>
+                </View>
+                <View style={styles.Footer}>
+                    <View style={styles.Content}>
 
                     <Text style={styles.LoginTitle}>Personal Info</Text>
                     {/*<Text style={styles.LoginTitle}>{ props.route.params.info.username}</Text>*/}
@@ -117,20 +120,16 @@ function RegistrationScreenTwo(props) {
                     <View style={styles.InlineButtons}>
                         <TouchableHighlight style={styles.LoginContainer1} onPress={() => navigation.goBack()}>
                             <View style={[styles.LoginButton, styles.InlineButtons]}>
-                                <View style={[styles.ArrowIcon, styles.InlineArrowBack]}>
-                                    <MaterialIcons name="arrow-back" size={30} color="white"/>
-                                </View>
-                                <Text style={[styles.LoginText, styles.InlineArrowTextBack]}>Back</Text>
+                                <MaterialIcons name="arrow-back" size={30} color="#09614F"/>
+                                <Text style={[styles.LoginText]}>Back</Text>
                             </View>
                         </TouchableHighlight>
                         <TouchableHighlight style={styles.LoginContainer1}
                                             onPress={() => [navigation.navigate('RegistrationThree',
                                                 {PersonalInfo, LoginInfo})]}>
                             <View style={[styles.LoginButton, styles.InlineButtons]}>
-                                <Text style={[styles.LoginText, styles.InlineArrowTextNext]}>Next</Text>
-                                <View style={[styles.ArrowIcon, styles.InlineArrowNext]}>
-                                    <MaterialIcons name="arrow-forward" size={30} color="white"/>
-                                </View>
+                                <Text style={[styles.LoginText]}>Next</Text>
+                                <MaterialIcons name="arrow-forward" size={30} color="#09614F"/>
                             </View>
                         </TouchableHighlight>
                     </View>
@@ -139,6 +138,7 @@ function RegistrationScreenTwo(props) {
                         style={styles.RegisterLink}
                     >We are almost there.</Text>
                 </View>
+                </View>
             </ImageBackground>
         </SafeAreaView>
     )
@@ -146,8 +146,8 @@ function RegistrationScreenTwo(props) {
 
 function RegistrationScreenThree(props) {
     const navigation = props.navigation
-    const [BackgroundColorGirl, setBackgroundColorGirl] = useState('white')
-    const [BackgroundColorSavior, setBackgroundColorSavior] = useState('white')
+    const [BackgroundColorGirl, setBackgroundColorGirl] = useState('rgb(98,94,94)')
+    const [BackgroundColorSavior, setBackgroundColorSavior] = useState('rgb(98,94,94)')
     const [pressedGirl, setpressedGirl] = useState(false)
     const [pressedSavior, setpressedSavior] = useState(false)
     const [UserType, setUserType] = useState('')
@@ -155,16 +155,18 @@ function RegistrationScreenThree(props) {
     const LoginInfo = props.route.params.LoginInfo;
     const PersonalInfo = props.route.params.PersonalInfo;
 
+    const { signUp } = React.useContext(AuthContext);
+
     function changeColorGirl(){
         if(!pressedGirl){
             setpressedGirl(true);
             setpressedSavior(false);
             setBackgroundColorGirl('rgb(255,149,110)');
-            setBackgroundColorSavior('white');
+            setBackgroundColorSavior('rgb(98,94,94)');
             setUserType('girl');
         } else {
             setpressedGirl(false);
-            setBackgroundColorGirl('white');
+            setBackgroundColorGirl('rgb(98,94,94)');
         }
     }
 
@@ -173,63 +175,63 @@ function RegistrationScreenThree(props) {
             setpressedSavior(true);
             setpressedGirl(false);
             setBackgroundColorSavior('rgb(255,149,110)');
-            setBackgroundColorGirl('white');
+            setBackgroundColorGirl('rgb(98,94,94)');
             setUserType('savior');
         } else {
             setpressedSavior(false);
-            setBackgroundColorSavior('white');
+            setBackgroundColorSavior('rgb(98,94,94)');
         }
     }
 
     return (
         <SafeAreaView style={styles.container}>
-            <ImageBackground blurRadius={6} source={require('../assets/bg-2.jpg')} style={styles.background}>
-                <View style={styles.Content}>
+            <ImageBackground blurRadius={6} source={require('../assets/black1.jpg')} style={styles.background}>
+                <View style={styles.HeaderS}>
                     <Text style={styles.LogoText}>Rescue Girls</Text>
+                </View>
+                <View style={styles.Footer}>
+                    <View style={styles.Content}>
 
-                    <Text style={styles.LoginTitle}>Choose One</Text>
+                        <Text style={styles.LoginTitle}>Choose One</Text>
 
-                    <View style={styles.ChoiceContainer}>
-                        <TouchableOpacity
-                            style={[{backgroundColor:BackgroundColorSavior, padding: 15}, styles.ChoiceSavior]}
-                            onPress={()=>{changeColorSavior(); console.log(pressedSavior)}}>
+                        <View style={styles.ChoiceContainer}>
+                            <TouchableOpacity
+                                style={[{backgroundColor:BackgroundColorSavior, padding: 15}, styles.ChoiceSavior]}
+                                onPress={()=>{changeColorSavior(); console.log(pressedSavior)}}>
 
-                            <Text style={styles.ChoiceSaviorText}>Savior</Text>
-                            <View style={styles.ChoiceSaviorIcon}>
-                                <MaterialCommunityIcons name="human-greeting" size={150} color="black" />
-                            </View>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={[{backgroundColor:BackgroundColorGirl, padding: 15}, styles.ChoiceGirl]}
-                            onPress={()=>{changeColorGirl(); console.log(pressedGirl)}}>
-
-                            <Text style={styles.ChoiceFemaleText}>Female</Text>
-                            <View style={styles.ChoiceFemaleIcon}>
-                                <FontAwesome name="female" size={130} color="black" />
-                            </View>
-                        </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.InlineButtons}>
-                        <TouchableHighlight style={styles.LoginContainer1} onPress={() => navigation.goBack()}>
-                            <View style={[styles.LoginButton, styles.InlineButtons]}>
-                                <View style={[styles.ArrowIcon, styles.InlineArrowBack]}>
-                                    <MaterialIcons name="arrow-back" size={30} color="white"/>
+                                <Text style={styles.ChoiceSaviorText}>Savior</Text>
+                                <View style={styles.ChoiceSaviorIcon}>
+                                    <MaterialCommunityIcons name="human-greeting" size={100} color="#DB592A" />
                                 </View>
-                                <Text style={[styles.LoginText, styles.InlineArrowTextBack]}>Back</Text>
-                            </View>
-                        </TouchableHighlight>
-                        <TouchableHighlight style={styles.LoginContainer1} onPress={() => {createAccount('Dashboard', PersonalInfo, LoginInfo, navigation, UserType)}}>
-                            <View style={[styles.LoginButton, styles.InlineButtons, styles.OrangeBackground]}>
-                                <Text style={[styles.LoginText, styles.InlineArrowTextNext]}>Done</Text>
-                                <View style={[styles.ArrowIcon, styles.InlineArrowNext]}>
-                                    <MaterialIcons name="arrow-forward" size={30} color="white"/>
-                                </View>
-                            </View>
-                        </TouchableHighlight>
-                    </View>
+                            </TouchableOpacity>
 
+                            <TouchableOpacity
+                                style={[{backgroundColor:BackgroundColorGirl, padding: 15}, styles.ChoiceGirl]}
+                                onPress={()=>{changeColorGirl(); console.log(pressedGirl)}}>
+
+                                <Text style={styles.ChoiceFemaleText}>Female</Text>
+                                <View style={styles.ChoiceFemaleIcon}>
+                                    <FontAwesome name="female" size={100} color="#DB592A" />
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.InlineButtons}>
+                            <TouchableHighlight style={styles.LoginContainer1} onPress={() => navigation.goBack()}>
+                                <View style={[styles.LoginButton, styles.InlineButtons]}>
+                                    <MaterialIcons name="arrow-back" size={30} color="#09614F"/>
+                                    <Text style={[styles.LoginText]}>Back</Text>
+                                </View>
+                            </TouchableHighlight>
+                            <TouchableHighlight style={styles.LoginContainer1} onPress={() => {signUp(PersonalInfo, LoginInfo, UserType)}}>
+                                <View style={[styles.LoginButton, styles.InlineButtons, styles.DoneBackground]}>
+                                    <Text style={[styles.LoginText, styles.DoneText]}>Done</Text>
+                                    <MaterialIcons name="arrow-forward" size={30} color="#4AFFDB"/>
+                                </View>
+                            </TouchableHighlight>
+                        </View>
+
+                    </View>
                 </View>
             </ImageBackground>
         </SafeAreaView>
@@ -244,7 +246,6 @@ const styles = StyleSheet.create({
     background: {
         flex: 1,
         justifyContent: "center",
-        // alignItems: 'center',
     },
     ChoiceContainer:{
         flexDirection: 'row',
@@ -254,20 +255,22 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     ChoiceSaviorText:{
-        fontSize: 40,
+        fontSize: 35,
     },
     ChoiceSaviorIcon:{
         position: 'absolute',
-        bottom: -10,
-        right: -5,
+        bottom: -5,
+        right: 0,
+        padding: 15
     },
     ChoiceFemaleText:{
-        fontSize: 40,
+        fontSize: 35,
     },
     ChoiceFemaleIcon:{
         position: 'absolute',
-        bottom: 10,
-        right: 10,
+        bottom: 0,
+        right: 0,
+        padding: 15
     },
     ChoiceSavior:{
         flex: 1,
@@ -284,44 +287,43 @@ const styles = StyleSheet.create({
     Content: {},
     container: {
         flex: 1,
-        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
+        // paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
+    },
+    DoneBackground:{
+        backgroundColor: '#09614F',
+    },
+    DoneText:{
+        color: '#4AFFDB'
     },
     Flexe1: {
         flex: 1,
     },
-    InlineArrowBack:{
-        left: '20%',
-        width: '100%'
+    Footer: {
+        flex: 3,
     },
-    InlineArrowNext:{
-        left: '56%',
-        width: '100%'
-    },
-    InlineArrowTextNext:{
-        left: '80%',
-        width: '100%'
-    },
-    InlineArrowTextBack:{
-        left: '130%',
-        width: '100%'
+    HeaderS: {
+        flex: 1,
+        justifyContent: 'center',
     },
     InlineButtons: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
     },
     InputCommon: {
-        height: 60,
+        height: "11%",
         margin: 12,
         borderWidth: 1,
         padding: 10,
         borderRadius: 5,
-        backgroundColor: 'rgba(5,15,26,0.6)',
+        backgroundColor: 'rgb(51,49,49)',
         color: '#c0c0c0',
         fontSize: 20
     },
+    Linke:{
+        color: '#DB592A',
+    },
     LoginButton: {
-        height: 60,
-        backgroundColor: '#09263f',
+        height: 50,
+        backgroundColor: '#2ADBB7',
         justifyContent: 'center', //Centered horizontally
         alignItems: 'center', //Centered vertically
         borderRadius: 50,
@@ -337,26 +339,22 @@ const styles = StyleSheet.create({
     },
     LoginText: {
         fontSize: 20,
-        color: '#fff'
+        color: '#09614F',
+        // flexDirection: 'row', justifyContent: 'center', alignItems: 'center'
     },
     LogoText: {
         width: '100%',
         height: 100,
-        // position: 'absolute',
-        top: -70,
         fontFamily: 'Playball_400Regular',
         fontSize: 60,
         textAlign: "center",
-        color: '#fff'
+        color: '#4AFFDB'
     },
     LoginTitle: {
         marginBottom: 20,
         fontSize: 40,
         textAlign: "center",
-        color: '#fff'
-    },
-    OrangeBackground:{
-        backgroundColor: 'rgb(255,112,51)',
+        color: '#4AFFDB'
     },
     Username: {},
     Password: {},
@@ -374,47 +372,3 @@ const styles = StyleSheet.create({
 
 export default RegistrationScreenOne;
 export {RegistrationScreenTwo, RegistrationScreenThree};
-
-done = (screenName, PersonalInfo, LoginInfo, navigation, UserType) => {
-    navigation.navigate(screenName)
-    return(console.log(PersonalInfo, LoginInfo, screenName, UserType))
-}
-
-
-const urls = {
-    registrationUrl: 'http://192.168.0.90:8000/api/registration/',
-    loginUrl: 'http://192.168.0.90:8000/api/login/',
-    apiUrl: 'http://192.168.0.90:8000/api/',
-}
-createAccount = (screenName, PersonalInfo, LoginInfo, navigation, UserType) => {
-    let is_girl = false;
-    let is_savior = false;
-    if (UserType === 'girl'){
-        is_girl = true;
-    }
-    if (UserType === 'savior'){
-        is_savior = true;
-    }
-    if (UserType === ''){
-        return alert('Choose User Type.')
-    }
-    if (is_girl !== false || is_savior !== false){
-        fetch(urls.registrationUrl, {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email: PersonalInfo.email,
-                username: LoginInfo.username,
-                first_name: PersonalInfo.firstName,
-                last_name: PersonalInfo.lastName,
-                password: LoginInfo.password,
-                password2: LoginInfo.password2,
-                is_girl: is_girl,
-                is_savior: is_savior,
-            })
-        });
-    }
-}

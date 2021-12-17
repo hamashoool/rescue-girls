@@ -52,6 +52,7 @@ def registration_view(request):
             data['response'] = 'Registration Successfully'
             data['email'] = serializer.data['email']
             data['username'] = serializer.data['username']
+            print(data['email'])
             data['Girl'] = serializer.data['is_girl']
             data['Saviour'] = serializer.data['is_savior']
             username = serializer.data['username']
@@ -77,6 +78,7 @@ def login_view(request):
             token = Token.objects.get(user=user.id)
             data['response'] = "Login Successfully"
             data['name'] = user.get_full_name()
+            data['username'] = user.username
             data['token'] = token.key
             return Response(data)
         else:

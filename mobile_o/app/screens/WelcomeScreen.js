@@ -1,47 +1,54 @@
 import React from 'react';
 import {
     StyleSheet, ImageBackground, Text, View, TouchableHighlight,
-    Platform, StatusBar
+    Platform, StatusBar, SafeAreaView
 } from 'react-native';
-
+import * as Animatable from 'react-native-animatable';
 
 function WelcomeScreen(props) {
     let navigation = props.navigation;
 
     return (
-        <View style={styles.container}>
+
+        <SafeAreaView style={styles.container}>
+            <StatusBar barStyle="light-content" backgroundColor="#000" />
             <ImageBackground
                 style={styles.background}
                 source={require('../assets/welcome2.jpg')}>
 
-                <Text style={styles.LogoText}>Rescue Girls</Text>
+                <Animatable.Text animation="zoomInUp" duration={2000} style={styles.LogoText}>Rescue
+                    Girls</Animatable.Text>
 
-                <View style={styles.TitleContainer}>
+                <Animatable.View animation="zoomIn" duration={2000} style={styles.TitleContainer}>
                     <Text style={styles.TitleOne}>Save The Day</Text>
                     <Text style={styles.TitleTwo}>Rescue the girls</Text>
-                </View>
+                </Animatable.View>
 
-                <TouchableHighlight style={styles.FullWidth} onPress={() => navigation.navigate('Login')}>
-                    <View style={styles.LoginButton}>
-                        <Text style={styles.LoginText}>Login</Text>
-                    </View>
-                </TouchableHighlight>
+                <Animatable.View animation="bounceInLeft" duration={2000} style={styles.FullWidth}>
+                    <TouchableHighlight style={styles.FullWidth} onPress={() => navigation.navigate('Login')}>
+                        <View style={styles.LoginButton}>
+                            <Text style={styles.LoginText}>Login</Text>
+                        </View>
+                    </TouchableHighlight>
+                </Animatable.View>
 
-                <TouchableHighlight style={styles.FullWidth} onPress={() => navigation.navigate('Registration')}>
-                    <View style={styles.RegistrationButton}>
-                        <Text style={styles.RegisterText}>Sign Up</Text>
-                    </View>
-                </TouchableHighlight>
+                <Animatable.View animation="bounceInRight" duration={2000} style={styles.FullWidth}>
+                    <TouchableHighlight style={styles.FullWidth} onPress={() => navigation.navigate('Registration')}>
+                        <View style={styles.RegistrationButton}>
+                            <Text style={styles.RegisterText}>Sign Up</Text>
+                        </View>
+                    </TouchableHighlight>
+                </Animatable.View>
 
             </ImageBackground>
-        </View>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+        // paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     },
     FullWidth: {
         width: '100%'
