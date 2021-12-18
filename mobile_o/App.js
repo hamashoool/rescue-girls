@@ -8,7 +8,7 @@ import RegistrationScreenOne, {RegistrationScreenThree, RegistrationScreenTwo} f
 import {createSharedElementStackNavigator} from "react-navigation-shared-element";
 import {CardStyleInterpolators} from '@react-navigation/stack';
 import HomeScreen from "./app/screens/HomeScreen";
-import {AuthContext, TokenContext, LoginValidationContext} from "./app/components/context";
+import {AuthContext, TokenContext, DataContext} from "./app/components/context";
 import * as SecureStore from "expo-secure-store";
 
 const Stack = createSharedElementStackNavigator();
@@ -27,6 +27,13 @@ export default function App() {
         token: null,
     });
     const [loginValid, setLoginValid] = useState(true);
+    const [registrationValid, setRegistrationValid] = useState(true);
+    const [regError, setRegError] = useState(null);
+    const data = {
+        LoginCheck: loginValid,
+        RegistrationCheck: registrationValid,
+        RegError: regError,
+    };
 
     const initialLoginState = {
         userToken: null,
@@ -139,8 +146,9 @@ export default function App() {
                 }).then(response => response.json())
                     .then(async json => {
                         if (!json.response) {
-                            alert('Invalid Registration Information.');
-                            console.log(json);
+                            setRegistrationValid(false);
+                            setRegError(json);
+                            // console.log(json);
                         }
                         if (json.Token) {
                             try {
@@ -162,7 +170,8 @@ export default function App() {
             }
         },
         closeError: () => {
-          setLoginValid(true);
+            setLoginValid(true);
+            setRegistrationValid(true);
         },
     }), []);
 
@@ -219,10 +228,6 @@ export default function App() {
             console.log(error);
         }
 
-        // if (userToken !== null){
-        //     getUser(userToken);
-        // }
-
         dispatch({type: 'RETRIEVE_TOKEN', token: userToken});
     }, []);
 
@@ -233,7 +238,7 @@ export default function App() {
     return (
         <AuthContext.Provider value={authContext}>
             {loginState.userToken == null ? (
-                    <LoginValidationContext.Provider value={loginValid}>
+                    <DataContext.Provider value={data}>
                         <NavigationContainer>
                             <Stack.Navigator>
                                 <Stack.Screen options={{headerShown: false}} name="Welcome" component={WelcomeScreen}/>
@@ -262,7 +267,7 @@ export default function App() {
                             </Stack.Navigator>
 
                         </NavigationContainer>
-                    </LoginValidationContext.Provider>
+                    </DataContext.Provider>
                 ) :
                 <TokenContext.Provider value={userInfo}>
                     <NavigationContainer>

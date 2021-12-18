@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import AwesomeAlert from "react-native-awesome-alerts";
 import * as SecureStore from "expo-secure-store";
-import {AuthContext, LoginValidationContext} from "../components/context";
+import {AuthContext, DataContext} from "../components/context";
 import {FontAwesome} from "@expo/vector-icons";
 import * as Animatable from 'react-native-animatable';
 
@@ -20,7 +20,7 @@ function LoginScreen(props) {
     const [Username, setUsername] = useState('');
     const [Password, setPassword] = useState('');
     const {signIn, closeError} = React.useContext(AuthContext);
-    const loginValid = React.useContext(LoginValidationContext);
+    const data = React.useContext(DataContext);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -47,7 +47,7 @@ function LoginScreen(props) {
                             secureTextEntry={true}
                             onChangeText={setPassword}
                         />
-                        {loginValid ? null :
+                        {data.LoginCheck ? null :
                             <Animatable.View animation="bounceIn" style={styles.ErrorView}>
                                 <View style={styles.ErrorInner}>
                                     <Text style={styles.ErrorText}>Invalid Login Information.</Text>

@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {
-    ImageBackground,
-    Platform,
+    ImageBackground, Modal,
+    Platform, Pressable,
     SafeAreaView,
     StatusBar,
     StyleSheet,
@@ -10,7 +10,7 @@ import {
     View
 } from 'react-native';
 import {MaterialIcons, FontAwesome, MaterialCommunityIcons} from '@expo/vector-icons';
-import {AuthContext} from "../components/context";
+import {AuthContext, DataContext} from "../components/context";
 
 function RegistrationScreenOne(props) {
     let navigation = props.navigation;
@@ -151,11 +151,12 @@ function RegistrationScreenThree(props) {
     const [pressedGirl, setpressedGirl] = useState(false)
     const [pressedSavior, setpressedSavior] = useState(false)
     const [UserType, setUserType] = useState('')
+    const data = React.useContext(DataContext);
 
     const LoginInfo = props.route.params.LoginInfo;
     const PersonalInfo = props.route.params.PersonalInfo;
 
-    const { signUp } = React.useContext(AuthContext);
+    const { signUp, closeError } = React.useContext(AuthContext);
 
     function changeColorGirl(){
         if(!pressedGirl){
@@ -231,6 +232,38 @@ function RegistrationScreenThree(props) {
                             </TouchableHighlight>
                         </View>
 
+                        <Modal
+                            animationType="fade"
+                            transparent={true}
+                            visible={!data.RegistrationCheck}
+                        >
+                            <View style={styles.centeredView}>
+                                <View style={styles.modalView}>
+                                    <Text style={{fontSize:22, fontWeight: 'bold', color: '#09614F'}}>
+                                        Invalid Registration Information!
+                                    </Text>
+                                    {!data.RegError ? null :
+                                        Object.entries(data.RegError).map(([key,value]) => (
+                                            <View style={styles.ErrorItem}>
+                                                <Text style={styles.ErrorKey}>
+                                                    {key} =>
+                                                </Text>
+                                                <Text style={styles.ErrorValue}>
+                                                    {value}
+                                                </Text>
+                                            </View>
+                                    ))
+                                    }
+                                    <TouchableHighlight
+                                        underlayColor='#4AFFDB'
+                                        style={styles.ModelClose}
+                                        onPress={() => {closeError(); console.log(data.RegError)}}
+                                    >
+                                        <Text style={{color: '#09614F', fontSize: 19}}>Close</Text>
+                                    </TouchableHighlight>
+                                </View>
+                            </View>
+                        </Modal>
                     </View>
                 </View>
             </ImageBackground>
@@ -246,6 +279,11 @@ const styles = StyleSheet.create({
     background: {
         flex: 1,
         justifyContent: "center",
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
     },
     ChoiceContainer:{
         flexDirection: 'row',
@@ -294,6 +332,21 @@ const styles = StyleSheet.create({
     },
     DoneText:{
         color: '#4AFFDB'
+    },
+    ErrorItem:{
+        marginTop: 5,
+        marginBottom: 5,
+        flexDirection: 'row',
+    },
+    ErrorKey:{
+        color: '#DB592A',
+        fontWeight: 'bold',
+        padding: 5,
+        fontSize: 18
+    },
+    ErrorValue:{
+        color: 'white',
+        padding: 5
     },
     Flexe1: {
         flex: 1,
@@ -355,6 +408,35 @@ const styles = StyleSheet.create({
         fontSize: 40,
         textAlign: "center",
         color: '#4AFFDB'
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: "rgba(0,0,0,0.91)",
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#DB592A',
+        padding: 35,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5
+    },
+    ModelClose: {
+        marginTop: 10,
+        marginBottom: -20,
+        borderWidth: 1,
+        borderColor: '#09614F',
+        paddingLeft: 18,
+        paddingRight: 18,
+        paddingTop: 2,
+        paddingBottom: 2,
+        borderRadius: 5,
+        alignSelf: 'center',
+        alignItems: 'center'
     },
     Username: {},
     Password: {},
