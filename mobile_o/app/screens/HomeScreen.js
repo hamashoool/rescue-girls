@@ -9,7 +9,7 @@ function HomeScreen(props) {
     return (
         <SafeAreaView style={styles.container}>
             <Button title={'sign out'} onPress={()=>{signOut()}}/>
-            <Text>
+            <Text style={{color: 'white'}}>
                 Hello @{userInfo.name}, your api token is: {userInfo.token}
             </Text>
         </SafeAreaView>
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'yellow',
+        backgroundColor: 'rgb(64,64,64)',
     },
 });
 

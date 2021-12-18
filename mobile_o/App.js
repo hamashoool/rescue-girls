@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import WelcomeScreen from "./app/screens/WelcomeScreen";
-import {NavigationContainer} from '@react-navigation/native';
+import {DarkTheme, NavigationContainer} from '@react-navigation/native';
 import LoginScreen from "./app/screens/LoginScreen";
 import {Playball_400Regular, useFonts} from "@expo-google-fonts/playball";
 import AppLoadingPlaceholder from "expo/build/launch/AppLoadingPlaceholder";
@@ -10,8 +10,15 @@ import {CardStyleInterpolators} from '@react-navigation/stack';
 import HomeScreen from "./app/screens/HomeScreen";
 import {AuthContext, TokenContext, DataContext} from "./app/components/context";
 import * as SecureStore from "expo-secure-store";
+import {createDrawerNavigator} from "@react-navigation/drawer";
+import SearchSavior from "./app/screens/SearchSavior";
+import ViewContacts from "./app/screens/ViewContacts";
+import DrawerContent from "./app/components/DrawerContent";
+import MaterialCommunityIcon from "react-native-paper/src/components/MaterialCommunityIcon";
+import {MaterialCommunityIcons} from "@expo/vector-icons";
 
 const Stack = createSharedElementStackNavigator();
+const Drawer = createDrawerNavigator();
 
 export default function App() {
     const urls = {
@@ -21,7 +28,6 @@ export default function App() {
         getUserUrl: 'http://192.168.0.90:8000/api/user/'
     };
     let [fontLoaded, error] = useFonts({Playball_400Regular});
-    let [Token, setToken] = useState(null);
     let [userInfo, setUserInfo] = useState({
         name: null,
         token: null,
@@ -270,12 +276,48 @@ export default function App() {
                     </DataContext.Provider>
                 ) :
                 <TokenContext.Provider value={userInfo}>
-                    <NavigationContainer>
-                        <Stack.Navigator>
-                            <Stack.Screen options={{
-                                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
+                    <NavigationContainer theme={DarkTheme}>
+                        <Drawer.Navigator
+                            initialRouteName="Home"
+                            drawerContent={props => <DrawerContent { ...props } />}
+                            screenOptions={{
+                                drawerActiveBackgroundColor: '#09614F',
+                                drawerActiveTintColor:'#6CFFDB',
+                                drawerInactiveTintColor: '#A9ABAB',
+                                drawerLabelStyle: {marginLeft: -25},
+                            }}
+                        >
+
+                            <Drawer.Screen options={{
+                                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                                drawerIcon: ({color}) => (
+                                    <MaterialCommunityIcon
+                                        name="home-outline"
+                                        color={color}
+                                        size={22} />
+                                )
                             }} name="Dashboard" component={HomeScreen}/>
-                        </Stack.Navigator>
+
+                            <Drawer.Screen options={{
+                                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                                drawerIcon: ({color}) => (
+                                    <MaterialCommunityIcon
+                                        name="account-plus-outline"
+                                        color={color}
+                                        size={22} />
+                                )
+                            }} name="Add Savior" component={SearchSavior}/>
+
+                            <Drawer.Screen options={{
+                                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                                drawerIcon: ({color}) => (
+                                    <MaterialCommunityIcon
+                                        name="contacts-outline"
+                                        color={color}
+                                        size={22} />
+                                )
+                            }} name="View Contacts" component={ViewContacts}/>
+                        </Drawer.Navigator>
                     </NavigationContainer>
                 </TokenContext.Provider>
             }
