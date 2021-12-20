@@ -52,14 +52,19 @@ def registration_view(request):
             data['response'] = 'Registration Successfully'
             data['email'] = serializer.data['email']
             data['username'] = serializer.data['username']
-            print(data['email'])
-            data['Girl'] = serializer.data['is_girl']
-            data['Saviour'] = serializer.data['is_savior']
             username = serializer.data['username']
             serializer.save()
             user = User.objects.get(username=username)
+            if user.is_savior:
+                user_type = 'savior'
+            elif user.is_girl:
+                user_type = 'girl'
+            else:
+                user_type = 'none'
             token = Token.objects.get(user=user.id)
             data['Token'] = token.key
+            data['name'] = user.get_full_name()
+            data['user_type'] = user_type
         else:
             data = serializer.errors
         return Response(data)
@@ -75,11 +80,19 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             user = User.objects.get(username=username)
+            if user.is_savior:
+                user_type = 'savior'
+            elif user.is_girl:
+                user_type = 'girl'
+            else:
+                user_type = 'none'
             token = Token.objects.get(user=user.id)
             data['response'] = "Login Successfully"
             data['name'] = user.get_full_name()
             data['username'] = user.username
             data['token'] = token.key
+            data['user_type'] = user_type
+            data['email'] = user.email
             return Response(data)
         else:
             data['error'] = "Invalid Info"

@@ -16,6 +16,7 @@ import ViewContacts from "./app/screens/ViewContacts";
 import DrawerContent from "./app/components/DrawerContent";
 import MaterialCommunityIcon from "react-native-paper/src/components/MaterialCommunityIcon";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
+import AlertsScreen from "./app/screens/Alerts";
 
 const Stack = createSharedElementStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -31,6 +32,9 @@ export default function App() {
     let [userInfo, setUserInfo] = useState({
         name: null,
         token: null,
+        email: null,
+        userType: null,
+        username: null,
     });
     const [loginValid, setLoginValid] = useState(true);
     const [registrationValid, setRegistrationValid] = useState(true);
@@ -94,11 +98,16 @@ export default function App() {
                             await SecureStore.setItemAsync('userToken', json.token);
                             await SecureStore.setItemAsync('userName', json.username);
                             await SecureStore.setItemAsync('Name', json.name);
+                            await SecureStore.setItemAsync('Email', json.email);
+                            await SecureStore.setItemAsync('userType', json.user_type);
                             setUserInfo(prevState => {
                                 return {
                                     ...prevState,
-                                    name: json.username,
+                                    name: json.name,
                                     token: json.token,
+                                    email: json.email,
+                                    userType: json.user_type,
+                                    username: json.username,
                                 };
                             });
                             setLoginValid(true);
@@ -154,17 +163,23 @@ export default function App() {
                         if (!json.response) {
                             setRegistrationValid(false);
                             setRegError(json);
-                            // console.log(json);
+                            console.log(json);
                         }
                         if (json.Token) {
                             try {
                                 await SecureStore.setItemAsync('userToken', json.Token);
                                 await SecureStore.setItemAsync('userName', json.username);
+                                await SecureStore.setItemAsync('Name', json.name);
+                                await SecureStore.setItemAsync('Email', json.email);
+                                await SecureStore.setItemAsync('userType', json.user_type);
                                 setUserInfo(prevState => {
                                     return {
                                         ...prevState,
-                                        name: json.username,
+                                        name: json.name,
                                         token: json.Token,
+                                        email: json.email,
+                                        userType: json.user_type,
+                                        username: json.username,
                                     };
                                 });
                                 dispatch({type: 'REGISTER', token: json.Token});
@@ -218,16 +233,28 @@ export default function App() {
     useEffect(async () => {
         let userToken;
         let userName;
+        let email;
+        let Name;
+        let userType;
         userToken = null;
         userName = null;
+        email = null;
+        Name = null;
+        userType = null;
         try {
             userToken = await SecureStore.getItemAsync('userToken');
             userName = await SecureStore.getItemAsync('userName');
+            email = await SecureStore.getItemAsync('Email');
+            Name = await SecureStore.getItemAsync('Name');
+            userType = await SecureStore.getItemAsync('userType');
             setUserInfo(prevState => {
                 return {
                     ...prevState,
-                    name: userName,
+                    name: Name,
                     token: userToken,
+                    email: email,
+                    username: userName,
+                    userType: userType,
                 };
             });
         } catch (error) {
@@ -236,6 +263,19 @@ export default function App() {
 
         dispatch({type: 'RETRIEVE_TOKEN', token: userToken});
     }, []);
+
+    const MyTheme = {
+        ...DarkTheme,
+        colors: {
+            ...DarkTheme.colors,
+            background: 'rgb(49,49,49)',
+            text: '#ffffff',
+            mainColor: '#6CFFDB',
+            darkerColor: '#09614F',
+            grayColor: '#A9ABAB',
+            secondColor: '#DB592A'
+        }
+    }
 
 
     if (!fontLoaded) {
@@ -276,15 +316,16 @@ export default function App() {
                     </DataContext.Provider>
                 ) :
                 <TokenContext.Provider value={userInfo}>
-                    <NavigationContainer theme={DarkTheme}>
+                    <NavigationContainer theme={MyTheme}>
                         <Drawer.Navigator
                             initialRouteName="Home"
-                            drawerContent={props => <DrawerContent { ...props } />}
+                            drawerContent={props => <DrawerContent {...props} />}
                             screenOptions={{
                                 drawerActiveBackgroundColor: '#09614F',
-                                drawerActiveTintColor:'#6CFFDB',
+                                drawerActiveTintColor: '#6CFFDB',
                                 drawerInactiveTintColor: '#A9ABAB',
                                 drawerLabelStyle: {marginLeft: -25},
+                                headerTintColor: '#6CFFDB',
                             }}
                         >
 
@@ -294,19 +335,9 @@ export default function App() {
                                     <MaterialCommunityIcon
                                         name="home-outline"
                                         color={color}
-                                        size={22} />
+                                        size={22}/>
                                 )
-                            }} name="Dashboard" component={HomeScreen}/>
-
-                            <Drawer.Screen options={{
-                                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-                                drawerIcon: ({color}) => (
-                                    <MaterialCommunityIcon
-                                        name="account-plus-outline"
-                                        color={color}
-                                        size={22} />
-                                )
-                            }} name="Add Savior" component={SearchSavior}/>
+                            }} name="Home" component={HomeScreen}/>
 
                             <Drawer.Screen options={{
                                 cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
@@ -314,9 +345,31 @@ export default function App() {
                                     <MaterialCommunityIcon
                                         name="contacts-outline"
                                         color={color}
-                                        size={22} />
+                                        size={22}/>
                                 )
                             }} name="View Contacts" component={ViewContacts}/>
+
+                            {userInfo.userType == 'savior' ?
+                                <Drawer.Screen options={{
+                                    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                                    drawerIcon: ({color}) => (
+                                        <MaterialCommunityIcon
+                                            name="eye-outline"
+                                            color={color}
+                                            size={22}/>
+                                    )
+                                }} name="View Alerts" component={AlertsScreen}/>
+                                :
+                                <Drawer.Screen options={{
+                                    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                                    drawerIcon: ({color}) => (
+                                        <MaterialCommunityIcon
+                                            name="account-plus-outline"
+                                            color={color}
+                                            size={22}/>
+                                    )
+                                }} name="Add Savior" component={SearchSavior}/>
+                            }
                         </Drawer.Navigator>
                     </NavigationContainer>
                 </TokenContext.Provider>

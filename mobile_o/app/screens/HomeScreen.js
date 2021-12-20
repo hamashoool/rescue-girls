@@ -1,30 +1,28 @@
 import React from 'react';
-import {Button, SafeAreaView, StyleSheet, Text, View} from 'react-native';
-import {AuthContext, TokenContext} from "../components/context";
+import {SafeAreaView, ScrollView, StyleSheet} from 'react-native';
+import {TokenContext} from "../components/context";
+import SaviorHome from "../components/SaviorHome";
+import GirlHome from "../components/GirlHome";
 
 function HomeScreen(props) {
-    const { signOut } = React.useContext(AuthContext);
     const userInfo = React.useContext(TokenContext);
 
     return (
         <SafeAreaView style={styles.container}>
-            <Button title={'sign out'} onPress={()=>{signOut()}}/>
-            <Text style={{color: 'white'}}>
-                Hello @{userInfo.name}, your api token is: {userInfo.token}
-            </Text>
+            <ScrollView showsVerticalScrollIndicator={false} style={{padding: 5}}>
+            {userInfo.userType === 'savior' ?
+                <SaviorHome/>
+                :
+                <GirlHome/>
+            }
+            </ScrollView>
         </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
-    text: {
-        color: 'white'
-    },
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgb(64,64,64)',
     },
 });
 

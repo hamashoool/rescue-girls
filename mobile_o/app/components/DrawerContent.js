@@ -11,11 +11,12 @@ import {
 } from '@react-navigation/drawer';
 import {StyleSheet, View} from 'react-native';
 import MaterialCommunityIcon from "react-native-paper/src/components/MaterialCommunityIcon";
-import {AuthContext} from "./context";
+import {AuthContext, TokenContext} from "./context";
 import {LinearGradient} from "expo-linear-gradient";
 
 function DrawerContent (props) {
     const { signOut } = React.useContext(AuthContext);
+    const userInfo = React.useContext(TokenContext);
 
     // const { signOut, toggleTheme } = React.useContext(AuthContext);
 
@@ -38,8 +39,8 @@ function DrawerContent (props) {
                                 style={{backgroundColor: 'rgba(255,255,255,0)'}}
                             />
                             <View style={{marginLeft:15, flexDirection:'column'}}>
-                                <Title style={styles.title}>Osman Hamashool</Title>
-                                <Caption style={styles.caption}>@osman</Caption>
+                                <Title style={styles.title}>{userInfo.name}</Title>
+                                <Caption style={styles.caption}>@{userInfo.username}</Caption>
                             </View>
                         </View>
 
