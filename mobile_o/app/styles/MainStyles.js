@@ -9,7 +9,7 @@ const styleSheet = StyleSheet.create({
         padding: 10
     },
     AlertGraphs: {
-        backgroundColor: myColors.grayColor,
+        backgroundColor: '#232825',
         marginBottom: 10
     },
     Inline: {

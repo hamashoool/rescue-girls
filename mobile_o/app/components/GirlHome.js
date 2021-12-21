@@ -1,19 +1,47 @@
 import React from 'react';
 
-import {Text, View} from 'react-native';
+import {Image, StyleSheet, Text, View} from 'react-native';
+import {TouchableHighlight} from "react-native-gesture-handler";
+import {MaterialCommunityIcons} from "@expo/vector-icons";
 
 const GirlHome = (props) => {
     return (
-        <Text style={{fontSize: 42}}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-            minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-            culpa qui officia deserunt mollit anim id est laborum.
-        </Text>
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{
+            width: 250,
+            height: 280,
+            aspectRatio: 1 * 1,
+            position: 'absolute'
+
+        }}>
+            <Image
+                source={require('../assets/bg-alert1.png')}
+                style={{
+                    resizeMode: 'cover',
+                    width: '100%',
+                    height: '100%'
+
+                }}
+            />
+        </View>
+        <TouchableHighlight onPress={() => {console.log('Alert')}} style={styles.button}
+                            underlayColor='rgb(73,13,13)'>
+            <MaterialCommunityIcons name="alert-rhombus-outline" size={140} color="white" />
+        </TouchableHighlight>
+    </View>
     );
 };
+
+const styles = StyleSheet.create({
+    button: {
+        backgroundColor: 'rgb(194,0,0)',
+        borderRadius: 150,
+        padding: 20,
+        borderColor: '#000',
+        borderWidth: 15,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+});
 
 export default GirlHome;

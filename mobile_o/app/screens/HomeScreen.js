@@ -9,13 +9,15 @@ function HomeScreen(props) {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView showsVerticalScrollIndicator={false} style={{padding: 5}}>
+
             {userInfo.userType === 'savior' ?
+                <ScrollView showsVerticalScrollIndicator={false} style={{padding: 5}}>
                 <SaviorHome/>
+                </ScrollView>
                 :
-                <GirlHome/>
+                <GirlHome />
             }
-            </ScrollView>
+
         </SafeAreaView>
     );
 }

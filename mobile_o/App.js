@@ -17,6 +17,7 @@ import DrawerContent from "./app/components/DrawerContent";
 import MaterialCommunityIcon from "react-native-paper/src/components/MaterialCommunityIcon";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import AlertsScreen from "./app/screens/Alerts";
+import {myColors} from "./app/utilities/colors";
 
 const Stack = createSharedElementStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -268,12 +269,8 @@ export default function App() {
         ...DarkTheme,
         colors: {
             ...DarkTheme.colors,
-            background: 'rgb(49,49,49)',
+            background: 'rgb(16,28,28)',
             text: '#ffffff',
-            mainColor: '#6CFFDB',
-            darkerColor: '#09614F',
-            grayColor: '#A9ABAB',
-            secondColor: '#DB592A'
         }
     }
 
@@ -325,7 +322,7 @@ export default function App() {
                                 drawerActiveTintColor: '#6CFFDB',
                                 drawerInactiveTintColor: '#A9ABAB',
                                 drawerLabelStyle: {marginLeft: -25},
-                                headerTintColor: '#6CFFDB',
+                                headerTintColor: myColors.white,
                             }}
                         >
 
