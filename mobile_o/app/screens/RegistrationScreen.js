@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import {MaterialIcons, FontAwesome, MaterialCommunityIcons} from '@expo/vector-icons';
 import {AuthContext, DataContext} from "../components/context";
+import styleSheet from "../styles/MainStyles";
 
 function RegistrationScreenOne(props) {
     let navigation = props.navigation;
@@ -238,7 +239,7 @@ function RegistrationScreenThree(props) {
                             visible={!data.RegistrationCheck}
                         >
                             <View style={styles.centeredView}>
-                                <View style={styles.modalView}>
+                                <View style={styleSheet.modalView}>
                                     <Text style={{fontSize:22, fontWeight: 'bold', color: '#09614F'}}>
                                         Invalid Registration Information!
                                     </Text>
@@ -256,7 +257,7 @@ function RegistrationScreenThree(props) {
                                     }
                                     <TouchableHighlight
                                         underlayColor='#4AFFDB'
-                                        style={styles.ModelClose}
+                                        style={styleSheet.ModelClose}
                                         onPress={() => {closeError(); console.log(data.RegError)}}
                                     >
                                         <Text style={{color: '#09614F', fontSize: 19}}>Close</Text>
@@ -408,35 +409,6 @@ const styles = StyleSheet.create({
         fontSize: 40,
         textAlign: "center",
         color: '#4AFFDB'
-    },
-    modalView: {
-        margin: 20,
-        backgroundColor: "rgba(0,0,0,0.91)",
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: '#DB592A',
-        padding: 35,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5
-    },
-    ModelClose: {
-        marginTop: 10,
-        marginBottom: -20,
-        borderWidth: 1,
-        borderColor: '#09614F',
-        paddingLeft: 18,
-        paddingRight: 18,
-        paddingTop: 2,
-        paddingBottom: 2,
-        borderRadius: 5,
-        alignSelf: 'center',
-        alignItems: 'center'
     },
     Username: {},
     Password: {},

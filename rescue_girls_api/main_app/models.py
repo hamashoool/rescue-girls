@@ -14,10 +14,28 @@ class User(AbstractUser):
     # USERNAME_FIELD = 'email'
 
 
+class Alert(models.Model):
+    girl = models.ForeignKey(User, on_delete=models.CASCADE, related_name='girl')
+    savior = models.ForeignKey(User, on_delete=models.CASCADE, related_name='savior')
+    date = models.DateTimeField(auto_now_add=True)
+    lat = models.FloatField()
+    lon = models.FloatField()
+
+    def __str__(self):
+        return f'Alert {self.girl.username} | on {self.date}'
+
+
+class Contact(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user')
+    people = models.ManyToManyField(User, related_name='people', blank=True)
+
+    def __str__(self):
+        return self.user.username
+
+
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
-
-
+        Contact.objects.create(user=instance)
 

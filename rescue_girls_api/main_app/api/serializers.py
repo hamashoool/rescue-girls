@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from main_app.models import User
+from main_app.models import User, Contact, Alert
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -35,3 +35,20 @@ class RegistrationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'password': "Passwords must match."})
         account.set_password(password)
         account.save()
+
+
+class ContactSerializer(serializers.ModelSerializer):
+    people = UserSerializer(read_only=True, many=True)
+    user = UserSerializer(read_only=True, many=False)
+
+    class Meta:
+        model = Contact
+        fields = '__all__'
+
+
+class AlertSerializer(serializers.ModelSerializer):
+    girl = UserSerializer(read_only=True, many=False)
+
+    class Meta:
+        model = Alert
+        fields = '__all__'

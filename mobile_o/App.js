@@ -27,7 +27,8 @@ export default function App() {
         registrationUrl: 'http://192.168.0.90:8000/api/registration/',
         loginUrl: 'http://192.168.0.90:8000/api/login/',
         apiUrl: 'http://192.168.0.90:8000/api/',
-        getUserUrl: 'http://192.168.0.90:8000/api/user/'
+        getUserUrl: 'http://192.168.0.90:8000/api/user/',
+        search: 'http://192.168.0.90:8000/api/search/?search=osman'
     };
     let [fontLoaded, error] = useFonts({Playball_400Regular});
     let [userInfo, setUserInfo] = useState({

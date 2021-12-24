@@ -7,10 +7,17 @@ from main_app.api.views import MyTokenObtainPairView
 
 urlpatterns = [
     path('', views.UserViewSet.as_view(), name="api"),
-    path('user/', views.get_user),
+    path('add/', views.add_savior),
+    path('alert/', views.alert),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('delete/', views.delete_savior),
+    path('get/alerts/', views.get_alerts),
+    path('get/contacts/', views.get_contacts),
     path('login/', views.login_view),
     path('registration/', views.registration_view),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('search/', views.Search.as_view()),
+    # path('search/', views.search_savior),
     path('token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('user/', views.get_user),
 ]
