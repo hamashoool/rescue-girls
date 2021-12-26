@@ -1,5 +1,7 @@
 import json
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.contrib.auth import authenticate
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers import serialize
@@ -12,8 +14,9 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from main_app.api.serializers import UserSerializer, RegistrationSerializer, ContactSerializer, AlertSerializer
-from main_app.models import User, Contact, Alert
+from main_app.api.serializers import UserSerializer, RegistrationSerializer, ContactSerializer, AlertSerializer, \
+    LocationSerializer, AlertItemSerializer, LocationCoordsSerializer
+from main_app.models import User, Contact, Alert, AlertItem, Location
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -169,11 +172,51 @@ def delete_savior(request):
 # it will return 'error' or 'success' since it is creating alert object
 @api_view(['POST'])
 @permission_classes((permissions.IsAuthenticated,))
+def create_location(request):
+    data = {}
+    if request.method == 'POST':
+
+        if not request.user.is_girl:
+            data['error'] = 'You are not female.'
+            return Response(data)
+
+        # get the alert
+        alert_id = request.data['alertId']
+        alert = Alert.objects.get(uuid=str(alert_id))
+
+        # get the location object
+        croods = request.data['croods']['coords']
+        location = Location.objects.create(
+            alert=alert,
+            accuracy=croods['accuracy'],
+            altitude=croods['altitude'],
+            altitudeAccuracy=croods['altitudeAccuracy'],
+            heading=croods['heading'],
+            latitude=croods['latitude'],
+            longitude=croods['longitude'],
+            speed=croods['speed'],
+        )
+        serialized_location = LocationSerializer(location).data
+
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            'alert_' + str(alert_id),
+            {
+                'type': 'send_location',
+                'data': serialized_location
+            }
+        )
+
+        data['response'] = serialized_location
+    return Response(data)
+
+
+# it will return 'error' or 'success' since it is creating alert object
+@api_view(['POST'])
+@permission_classes((permissions.IsAuthenticated,))
 def alert(request):
     data = {}
     if request.method == 'POST':
-        lat = request.data['lat']
-        lon = request.data['lon']
 
         if not request.user.is_girl:
             data['error'] = 'You are not female.'
@@ -182,14 +225,19 @@ def alert(request):
         contact = Contact.objects.get(user=request.user)
         people = contact.people.exclude(username=request.user.username)
 
-        for person in people:
-            Alert.objects.create(
-                lat=lat,
-                lon=lon,
-                girl=request.user,
-                savior=person
-            )
+        alert = Alert.objects.create(
+            girl=request.user,
+        )
+
+        if people:
+            for person in people:
+                AlertItem.objects.create(
+                    alert=alert,
+                    savior=person
+                )
+
         data['success'] = 'Alert has been created.'
+        data['alert_id'] = alert.uuid
     return Response(data)
 
 
@@ -212,6 +260,21 @@ def get_alerts(request):
             data = {'error': 'You are not savior.'}
             return Response(data)
 
-        alerts = Alert.objects.filter(savior=request.user)
-        data = AlertSerializer(alerts, many=True).data
+        alert_items = AlertItem.objects.filter(savior=request.user)
+        data = AlertItemSerializer(alert_items, many=True).data
+        return Response(data)
+
+
+# it will return list of alert objects
+@api_view(['GET'])
+@permission_classes((permissions.IsAuthenticated,))
+def get_location(request, alert_id):
+    if request.method == 'GET':
+        if not request.user.is_savior:
+            data = {'error': 'You are not savior.'}
+            return Response(data)
+
+        loaction = Location.objects.filter(alert_id=alert_id).first()
+        data = LocationCoordsSerializer(loaction, many=False).data
+        print(loaction)
         return Response(data)

@@ -1,14 +1,16 @@
-import React, {useState} from 'react';
+// import '../utilities/_mockLocation';
+import React, {useState, useContext, useEffect} from 'react';
 
-import {StyleSheet, FlatList, SafeAreaView, Text, View} from 'react-native';
+import {StyleSheet, ActivityIndicator, FlatList, SafeAreaView, Text, View} from 'react-native';
 import {myColors} from "../utilities/colors";
 import {TouchableHighlight, TouchableOpacity} from "react-native-gesture-handler";
 import styleSheet from "../styles/MainStyles";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import MapScreen from "./MapScreen";
-import MapView, {Marker} from "react-native-maps";
+import MapView, {Circle, Marker} from "react-native-maps";
 import ActionButton from "react-native-action-button";
 import MaterialCommunityIcon from "react-native-paper/src/components/MaterialCommunityIcon";
+import {AuthContext, TokenContext} from "../context/context";
 
 
 const DATA = [
@@ -55,48 +57,114 @@ const DATA = [
 ];
 
 const AlertsScreen = (props) => {
+    const userInfo = React.useContext(TokenContext);
+    const [ alertData, setAlertData ] = useState(null);
+    let [mapRegion, setmapRegion] = useState(null);
     const [mapControl, setMapControl] = useState(false);
-    const Item = ({ title }) => (
-        <TouchableOpacity style={styles.item} onPress={() => {setMapControl(true)}}>
-            <Text style={[styles.title, {textAlign: 'center', fontWeight: 'bold', paddingBottom: 5, }]}>Nancy Ajram</Text>
+
+    const getAlerts = () => {
+        fetch('http://192.168.0.90:8000/api/get/alerts/',{
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Token ' + userInfo.token
+            }
+        })
+            .then(response => response.json())
+            .then(async data => await setAlertData(data));
+    }
+
+    const getLocation = (alertId) => {
+        fetch('http://192.168.0.90:8000/api/get/location/'+alertId+'/',{
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Token ' + userInfo.token
+            }
+        })
+            .then(response => response.json())
+            .then(async data => await setmapRegion(data));
+    }
+
+    const connectWS = (alertId) => {
+        const ws = new WebSocket(`ws://192.168.0.90:8000/ws/alert/${alertId}/`);
+
+        ws.onmessage = (e) => {
+            // a message was received
+            console.log({received: e.data});
+        };
+    }
+
+    const Item = ({name, date, live, alertId}) => (
+        <TouchableOpacity style={styles.item} onPress={() => {
+            setMapControl(true)
+            getLocation(alertId)
+            connectWS(alertId)
+        }}>
+            <Text style={[styles.title, {textAlign: 'center', fontWeight: 'bold', paddingBottom: 5,}]}>
+                {name}</Text>
             <View style={styleSheet.Inline}>
-                <MaterialCommunityIcons name="alert" size={24} color="orange" />
-                <Text style={styles.title}>23.111</Text>
-                <Text style={styles.title}>90.657</Text>
-                <MaterialCommunityIcons name="alert" size={24} color="orange" />
+                <MaterialCommunityIcons name="alert" size={24} color="orange"/>
+                {live ?
+                    <Text style={[styles.title, {color: '#22ff00',}]}>Live Now</Text>
+                    :
+                    <Text style={styles.title}>Offline</Text>
+                }
+                <Text style={styles.title}>{new Date(Date.parse(date)).toDateString()}</Text>
+                <MaterialCommunityIcons name="alert" size={24} color="orange"/>
             </View>
         </TouchableOpacity>
     );
-    const renderItem = ({ item }) => (
-        <Item title={item.title} />
+
+    const renderItem = ({item}) => (
+        <Item
+            name={item.alert.girl.first_name+' '+item.alert.girl.last_name}
+            date={item.alert.date}
+            live={item.alert.is_live}
+            alertId={item.alert.uuid}
+        />
     );
-    const [mapRegion, setmapRegion] = useState({
-        latitude: 37.78825,
-        longitude: -122.4324,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-    });
+
+    useEffect(()=>{
+        getAlerts();
+    }, []);
 
     return (
         <SafeAreaView style={styles.container}>
             {!mapControl ?
                 <FlatList
-                    data={DATA}
+                    data={alertData}
                     renderItem={renderItem}
                     keyExtractor={item => item.id}
                 />
                 :
                 <View>
                     <MapView
-                        style={{ alignSelf: 'stretch', height: '100%' }}
+                        style={{alignSelf: 'stretch', height: '100%'}}
                         region={mapRegion}
                     >
-                        <Marker coordinate={mapRegion} title='Marker' />
+                        <Marker
+                            coordinate={mapRegion}
+                            title='Marker'
+                            pinColor={'#ff4b00'}
+                        />
+                        <Circle
+                            center={mapRegion}
+                            radius={40}
+                            strokeColor={'rgb(0,136,93)'}
+                            fillColor={'rgba(0,136,93,0.2)'}
+                        />
                     </MapView>
                     <ActionButton
                         buttonColor={myColors.darkerColor}
-                        onPress={() => { setMapControl(false)}}
-                        icon={<MaterialCommunityIcon name="close-thick" color={myColors.white} size={30} />}
+                        onPress={() => {
+                            setMapControl(false)
+                        }}
+                        renderIcon={active => active ? (
+                            <MaterialCommunityIcon name="close-thick" color={myColors.white} size={30}/>) : (
+                            <MaterialCommunityIcon name="close-thick" color={myColors.white} size={30}/>)}
                     >
 
                     </ActionButton>

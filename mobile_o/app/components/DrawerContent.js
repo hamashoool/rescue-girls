@@ -11,7 +11,7 @@ import {
 } from '@react-navigation/drawer';
 import {StyleSheet, View} from 'react-native';
 import MaterialCommunityIcon from "react-native-paper/src/components/MaterialCommunityIcon";
-import {AuthContext, TokenContext} from "./context";
+import {AuthContext, TokenContext} from "../context/context";
 import {LinearGradient} from "expo-linear-gradient";
 
 function DrawerContent (props) {

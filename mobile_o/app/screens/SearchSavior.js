@@ -5,7 +5,7 @@ import {SearchBar} from "react-native-elements";
 import styleSheet from "../styles/MainStyles";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import {myColors} from "../utilities/colors";
-import {TokenContext} from "../components/context";
+import {TokenContext} from "../context/context";
 
 function SearchSavior(props) {
     const [search, setSearch] = useState("");

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
+    'channels',
 
     # my applications
     'main_app.apps.MainAppConfig',
@@ -79,7 +80,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'rescue_girls_api.wsgi.application'
+# WSGI_APPLICATION = 'rescue_girls_api.wsgi.application'
+ASGI_APPLICATION = 'rescue_girls_api.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -176,3 +178,9 @@ SIMPLE_JWT = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}

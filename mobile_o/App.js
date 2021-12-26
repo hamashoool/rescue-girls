@@ -8,7 +8,7 @@ import RegistrationScreenOne, {RegistrationScreenThree, RegistrationScreenTwo} f
 import {createSharedElementStackNavigator} from "react-navigation-shared-element";
 import {CardStyleInterpolators} from '@react-navigation/stack';
 import HomeScreen from "./app/screens/HomeScreen";
-import {AuthContext, TokenContext, DataContext} from "./app/components/context";
+import {AuthContext, TokenContext, DataContext} from "./app/context/context";
 import * as SecureStore from "expo-secure-store";
 import {createDrawerNavigator} from "@react-navigation/drawer";
 import SearchSavior from "./app/screens/SearchSavior";
@@ -18,6 +18,7 @@ import MaterialCommunityIcon from "react-native-paper/src/components/MaterialCom
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import AlertsScreen from "./app/screens/Alerts";
 import {myColors} from "./app/utilities/colors";
+import * as Location from "expo-location";
 
 const Stack = createSharedElementStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -264,6 +265,7 @@ export default function App() {
         }
 
         dispatch({type: 'RETRIEVE_TOKEN', token: userToken});
+        await Location.requestForegroundPermissionsAsync();
     }, []);
 
     const MyTheme = {
@@ -280,6 +282,7 @@ export default function App() {
         return <AppLoadingPlaceholder/>
     }
     return (
+        // <LocationProvider>
         <AuthContext.Provider value={authContext}>
             {loginState.userToken == null ? (
                     <DataContext.Provider value={data}>
@@ -373,5 +376,6 @@ export default function App() {
                 </TokenContext.Provider>
             }
         </AuthContext.Provider>
+        // </LocationProvider>
     );
 }

@@ -10,7 +10,7 @@ import {
     View
 } from 'react-native';
 import {MaterialIcons, FontAwesome, MaterialCommunityIcons} from '@expo/vector-icons';
-import {AuthContext, DataContext} from "../components/context";
+import {AuthContext, DataContext} from "../context/context";
 import styleSheet from "../styles/MainStyles";
 
 function RegistrationScreenOne(props) {

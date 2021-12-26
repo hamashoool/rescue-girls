@@ -14,7 +14,7 @@ import {
 import MaterialCommunityIcon from "react-native-paper/src/components/MaterialCommunityIcon";
 import styleSheet from "../styles/MainStyles";
 import {myColors} from "../utilities/colors";
-import {TokenContext} from "../components/context";
+import {TokenContext} from "../context/context";
 
 const marginBottomItem = 10;
 const paddingItem = 10;

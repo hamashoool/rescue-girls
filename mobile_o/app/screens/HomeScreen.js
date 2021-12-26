@@ -1,6 +1,6 @@
 import React from 'react';
 import {SafeAreaView, ScrollView, StyleSheet} from 'react-native';
-import {TokenContext} from "../components/context";
+import {TokenContext} from "../context/context";
 import SaviorHome from "../components/SaviorHome";
 import GirlHome from "../components/GirlHome";
 

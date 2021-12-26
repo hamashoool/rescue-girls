@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import AwesomeAlert from "react-native-awesome-alerts";
 import * as SecureStore from "expo-secure-store";
-import {AuthContext, DataContext} from "../components/context";
+import {AuthContext, DataContext} from "../context/context";
 import {FontAwesome} from "@expo/vector-icons";
 import * as Animatable from 'react-native-animatable';
 

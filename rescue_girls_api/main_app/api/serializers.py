@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from main_app.models import User, Contact, Alert
+from main_app.models import User, Contact, Alert, Location, AlertItem
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -52,3 +52,29 @@ class AlertSerializer(serializers.ModelSerializer):
     class Meta:
         model = Alert
         fields = '__all__'
+
+
+class AlertItemSerializer(serializers.ModelSerializer):
+    alert = AlertSerializer(read_only=True, many=False)
+    user = UserSerializer(read_only=True, many=False)
+
+    class Meta:
+        model = AlertItem
+        fields = '__all__'
+
+
+class LocationSerializer(serializers.ModelSerializer):
+    alert = AlertSerializer(read_only=True, many=False)
+
+    class Meta:
+        model = Location
+        fields = '__all__'
+
+
+class LocationCoordsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Location
+        fields = [
+            'altitude', 'altitudeAccuracy', 'heading', 'latitude',
+            'longitude', 'speed', 'latitudeDelta', 'longitudeDelta'
+        ]
