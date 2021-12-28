@@ -30,6 +30,11 @@ class AlertConsumer(AsyncWebsocketConsumer):
     def get_first_location(self):
         return Location.objects.filter(alert_id=self.room_name).first()
 
+    async def send_location(self, event):
+        data = event['data']
+        print(data)
+        await self.send(text_data=json.dumps(data))
+
 
 class GirlConsumer(AsyncWebsocketConsumer):
 
@@ -56,12 +61,10 @@ class GirlConsumer(AsyncWebsocketConsumer):
         self.created_location = await self.create_location()
         serialized_location = LocationCoordsSerializer(self.created_location, many=False).data
         channel_layer = get_channel_layer()
-        await channel_layer.send( self.room_group_name, {
+        await channel_layer.group_send(self.room_group_name, {
             "type": "send_location",
             "data": serialized_location
         })
-        print(serialized_location)
-            # await self.send(text_data=json.dumps(serialized_location))
 
     @database_sync_to_async
     def create_location(self):
@@ -84,4 +87,5 @@ class GirlConsumer(AsyncWebsocketConsumer):
 
     async def send_location(self, event):
         data = event['data']
+        print(data)
         await self.send(text_data=json.dumps(data))
