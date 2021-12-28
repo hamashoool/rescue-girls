@@ -1,6 +1,6 @@
 // import '../utilities/_mockLocation';
 
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState, useRef} from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
 import {TouchableHighlight} from "react-native-gesture-handler";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
@@ -8,13 +8,13 @@ import * as Location from "expo-location";
 import {TokenContext} from "../context/context";
 
 const GirlHome = (props) => {
-    const userInfo = React.useContext(TokenContext);
+    const userInfo = useContext(TokenContext);
     const [live, setLive] = useState(false);
     const [subscriber, setSubscriber] = useState(null);
     let [alertId, setAlertId] = useState(null);
+    const ws = useRef(null);
 
     const createLocation = (location) => {
-        // console.log(alertId)
 
         //create alert and return alert id, then save it.
         fetch('http://192.168.0.90:8000/api/create/location/', {
@@ -29,12 +29,11 @@ const GirlHome = (props) => {
                 croods: location
             })
         })
-            .then(response => response.json())
-            .then(data => console.log(data));
+            // .then(response => response.json())
+            // .then(data => console.log(data));
     }
 
-    const createAlert = async () => {
-
+    const createAlert = () => {
         // create alert and return alert id, then save it.
         fetch('http://192.168.0.90:8000/api/create/alert/', {
             method: 'POST',
@@ -45,41 +44,49 @@ const GirlHome = (props) => {
             },
         })
             .then(response => response.json())
-            .then(async data => await setAlertId(data.alert_id));
+            .then(data => setAlertId(data.alert_id));
+    }
 
-        // start watching the user
-        // if (alertId) {
+    const startWatching = async () => {
         try {
             const sub = await Location.watchPositionAsync(
                 {
                     accuracy: Location.Accuracy.BestForNavigation,
                     timeInterval: 1000,
-                    distanceInterval: 10
+                    distanceInterval: 1
                 },
                 location => {
-                    createLocation(location);
+                    // createLocation(location);
+                    ws.current.send(JSON.stringify(location));
                 }
             );
             setSubscriber(sub);
         } catch (e) {
             setErr(e);
         }
-        // }
     }
+
     const stopWatch = () => {
         if (subscriber) {
             subscriber.remove();
+            setAlertId(null);
         }
         console.log('Stoped.')
     }
 
     useEffect(() => {
         if (live) {
-            createAlert();
+            if (alertId !== null) {
+                startWatching();
+                ws.current = new WebSocket(`ws://192.168.0.90:8000/ws/alert/${alertId}/${userInfo.username}/?token=${userInfo.token}`);
+            } else {
+                createAlert();
+            }
+
         } else {
             stopWatch();
         }
-    }, [live]);
+    }, [live, alertId]);
 
     return (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>

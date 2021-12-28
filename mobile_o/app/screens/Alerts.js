@@ -12,54 +12,10 @@ import ActionButton from "react-native-action-button";
 import MaterialCommunityIcon from "react-native-paper/src/components/MaterialCommunityIcon";
 import {AuthContext, TokenContext} from "../context/context";
 
-
-const DATA = [
-    {
-        id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-        title: 'First Item',
-    },
-    {
-        id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-        title: 'Second Item',
-    },
-    {
-        id: '58694a0f-3da1-471f-bd96-145571e29d72',
-        title: 'Third Item',
-    },
-    {
-        id: 'bd7acbea-c1b1-46c2-aed5-3aad53abb28ba',
-        title: 'First Item',
-    },
-    {
-        id: '3ac68afc-c605-48d3-a4f8-fbd91aaa97f63',
-        title: 'Second Item',
-    },
-    {
-        id: '58694a0f-3da1-471f-bd96-14557a1e29d72',
-        title: 'Third Item',
-    },
-    {
-        id: 'bd7acbea-c1b1-46c2-aead5-3aad53abb28ba',
-        title: 'First Item',
-    },
-    {
-        id: '3ac68afc-c605-48d3-aa4f8-fbd91aaa97f63',
-        title: 'Second Item',
-    },
-    {
-        id: '58694a0f-3da1-471f-bda96-14557a1e29d72',
-        title: 'Third Item',
-    },
-    {
-        id: '58694aa0f-3da1-471f-bda96-14557a1e29d72',
-        title: 'Third Item',
-    },
-];
-
 const AlertsScreen = (props) => {
     const userInfo = React.useContext(TokenContext);
     const [ alertData, setAlertData ] = useState(null);
-    let [mapRegion, setmapRegion] = useState(null);
+    const [mapRegion, setMapRegion] = useState(null);
     const [mapControl, setMapControl] = useState(false);
 
     const getAlerts = () => {
@@ -72,11 +28,11 @@ const AlertsScreen = (props) => {
             }
         })
             .then(response => response.json())
-            .then(async data => await setAlertData(data));
+            .then(data => setAlertData(data));
     }
 
-    const getLocation = (alertId) => {
-        fetch('http://192.168.0.90:8000/api/get/location/'+alertId+'/',{
+    const getLocation = async (alertId) => {
+        await fetch(`http://192.168.0.90:8000/api/get/location/${alertId}/`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -85,22 +41,42 @@ const AlertsScreen = (props) => {
             }
         })
             .then(response => response.json())
-            .then(async data => await setmapRegion(data));
+            .then(data => setMapRegion(data));
+        console.log(mapRegion);
     }
 
     const connectWS = (alertId) => {
-        const ws = new WebSocket(`ws://192.168.0.90:8000/ws/alert/${alertId}/`);
+        const ws = new WebSocket(`ws://192.168.0.90:8000/ws/alert/${alertId}/?token=${userInfo.token}`);
 
-        ws.onmessage = (e) => {
+        ws.onmessage = async (e) => {
             // a message was received
-            console.log({received: e.data});
+            const dataObj = JSON.parse(e.data)
+            await setMapRegion(dataObj)
+
+            if (dataObj.latitude !== null) {
+                await setMapControl(true)
+            }
+
+            console.log('message', dataObj);
+        };
+        ws.onopen = (e) => {
+            // a message was received
+            console.log('open', e);
+            // ws.send(JSON.stringify({msg: 'From savior'}))
+        };
+        ws.onerror = (e) => {
+            // a message was received
+            console.log('error', e);
+        };
+        ws.onclose = (e) => {
+            // a message was received
+            console.log('close', e);
         };
     }
 
     const Item = ({name, date, live, alertId}) => (
         <TouchableOpacity style={styles.item} onPress={() => {
-            setMapControl(true)
-            getLocation(alertId)
+            // getLocation(alertId)
             connectWS(alertId)
         }}>
             <Text style={[styles.title, {textAlign: 'center', fontWeight: 'bold', paddingBottom: 5,}]}>
@@ -146,7 +122,12 @@ const AlertsScreen = (props) => {
                         region={mapRegion}
                     >
                         <Marker
-                            coordinate={mapRegion}
+                            coordinate={{
+                                latitude: mapRegion.latitude,
+                                longitude: mapRegion.longitude,
+                                latitudeDelta: mapRegion.latitudeDelta,
+                                longitudeDelta: mapRegion.longitudeDelta
+                            }}
                             title='Marker'
                             pinColor={'#ff4b00'}
                         />

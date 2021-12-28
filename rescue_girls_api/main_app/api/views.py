@@ -260,7 +260,7 @@ def get_alerts(request):
             data = {'error': 'You are not savior.'}
             return Response(data)
 
-        alert_items = AlertItem.objects.filter(savior=request.user)
+        alert_items = AlertItem.objects.filter(savior=request.user).order_by('-alert__date')
         data = AlertItemSerializer(alert_items, many=True).data
         return Response(data)
 
@@ -276,5 +276,5 @@ def get_location(request, alert_id):
 
         loaction = Location.objects.filter(alert_id=alert_id).first()
         data = LocationCoordsSerializer(loaction, many=False).data
-        print(loaction)
+        print(data)
         return Response(data)
