@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "11535057218",
+    "project_id": "rescue-girls-b6fa6",
+    "storage_bucket": "rescue-girls-b6fa6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:11535057218:android:1fee0511f6e3a55a5688db",
+        "android_client_info": {
+          "package_name": "com.hamashool.rescue"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "11535057218-6b3h6juhot1lg17a19i0lklo5tprj2tg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQ0hYN20gm7oLvTDNEtKF59tgPGduLB_w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "11535057218-6b3h6juhot1lg17a19i0lklo5tprj2tg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
