@@ -1,23 +1,25 @@
 // import '../utilities/_mockLocation';
 
 import React, {useContext, useEffect, useState, useRef} from 'react';
-import {Image, StyleSheet, Text, View} from 'react-native';
+import {DevSettings, Image, StyleSheet, Text, View} from 'react-native';
 import {TouchableHighlight} from "react-native-gesture-handler";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import * as Location from "expo-location";
 import {TokenContext} from "../context/context";
+import * as Updates from "expo-updates";
 
 const GirlHome = (props) => {
+    const delUrl = 'http://192.168.0.90:8000/api/delete/alert/';
     const userInfo = useContext(TokenContext);
     const [live, setLive] = useState(false);
     const [subscriber, setSubscriber] = useState(null);
     let [alertId, setAlertId] = useState(null);
     const ws = useRef(null);
 
-    const createLocation = (location) => {
+    const updateAlert = () => {
 
         //create alert and return alert id, then save it.
-        fetch('http://192.168.0.90:8000/api/create/location/', {
+        fetch('http://192.168.0.90:8000/api/update/alert/', {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
@@ -26,11 +28,14 @@ const GirlHome = (props) => {
             },
             body: JSON.stringify({
                 alertId: alertId,
-                croods: location
             })
         })
-            // .then(response => response.json())
-            // .then(data => console.log(data));
+            .then(response => response.json())
+            .then(data => {
+                if (data.done){
+                    setAlertId(null);
+                }
+            });
     }
 
     const createAlert = () => {
@@ -55,20 +60,40 @@ const GirlHome = (props) => {
                     timeInterval: 1000,
                     distanceInterval: 1
                 },
-                location => {
+                async location => {
                     // createLocation(location);
-                    ws.current.send(JSON.stringify(location));
+                    location.action = 'open'
+                    try {
+                        await ws.current.send(JSON.stringify(location));
+                    } catch (error) {
+                        console.log(error);
+                        await fetch(delUrl, {
+                            method: 'POST',
+                            headers: {
+                                Accept: 'application/json',
+                                'Content-Type': 'application/json',
+                                'Authorization': 'Token ' + userInfo.token
+                            },
+                            body: JSON.stringify({
+                                alert_id: alertId
+                            })
+                        });
+                        await Updates.reloadAsync();
+                    }
                 }
             );
             setSubscriber(sub);
         } catch (e) {
-            setErr(e);
+            console.log(e);
         }
     }
 
     const stopWatch = () => {
         if (subscriber) {
             subscriber.remove();
+            // updateAlert();
+            ws.current.send(JSON.stringify({action: 'close'}));
+            ws.current.close();
             setAlertId(null);
         }
         console.log('Stoped.')
@@ -98,11 +123,6 @@ const GirlHome = (props) => {
                 position: 'absolute'
 
             }}>
-                {live ?
-                    <Text style={{color: '#fff', fontSize: 30}}>Watching...</Text>
-                    :
-                    <Text style={{color: '#fff', fontSize: 30}}>Not Watching.</Text>
-                }
                 <Image
                     source={require('../assets/bg-alert1.png')}
                     style={{

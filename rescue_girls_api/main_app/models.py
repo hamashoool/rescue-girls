@@ -51,9 +51,19 @@ class Contact(models.Model):
         return self.user.username
 
 
+class NotificationToken(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return self.user.username
+
+
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
         Contact.objects.create(user=instance)
 
+        if instance.is_savior:
+            NotificationToken.objects.create(user=instance)

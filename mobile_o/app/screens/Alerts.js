@@ -1,7 +1,7 @@
 // import '../utilities/_mockLocation';
-import React, {useState, useContext, useEffect} from 'react';
+import React, {useState, useContext, useEffect, useRef} from 'react';
 
-import {StyleSheet, ActivityIndicator, FlatList, SafeAreaView, Text, View} from 'react-native';
+import {StyleSheet, ActivityIndicator, FlatList, SafeAreaView, Text, View, RefreshControl} from 'react-native';
 import {myColors} from "../utilities/colors";
 import {TouchableHighlight, TouchableOpacity} from "react-native-gesture-handler";
 import styleSheet from "../styles/MainStyles";
@@ -11,15 +11,18 @@ import MapView, {Circle, Marker} from "react-native-maps";
 import ActionButton from "react-native-action-button";
 import MaterialCommunityIcon from "react-native-paper/src/components/MaterialCommunityIcon";
 import {AuthContext, TokenContext} from "../context/context";
+import * as Animatable from 'react-native-animatable';
 
 const AlertsScreen = (props) => {
     const userInfo = React.useContext(TokenContext);
-    const [ alertData, setAlertData ] = useState(null);
+    const [alertData, setAlertData] = useState(null);
     const [mapRegion, setMapRegion] = useState(null);
     const [mapControl, setMapControl] = useState(false);
+    const [isLoading, setIsloading] = useState(false);
+    const ws = useRef();
 
     const getAlerts = () => {
-        fetch('http://192.168.0.90:8000/api/get/alerts/',{
+        fetch('http://192.168.0.90:8000/api/get/alerts/', {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -28,7 +31,8 @@ const AlertsScreen = (props) => {
             }
         })
             .then(response => response.json())
-            .then(data => setAlertData(data));
+            .then(data => setAlertData(data))
+            .finally(() => setIsloading(false));
     }
 
     const getLocation = async (alertId) => {
@@ -46,12 +50,20 @@ const AlertsScreen = (props) => {
     }
 
     const connectWS = (alertId) => {
-        const ws = new WebSocket(`ws://192.168.0.90:8000/ws/alert/${alertId}/?token=${userInfo.token}`);
+        ws.current = new WebSocket(`ws://192.168.0.90:8000/ws/alert/${alertId}/?token=${userInfo.token}`);
 
-        ws.onmessage = async (e) => {
+        ws.current.onmessage = async (e) => {
             // a message was received
             const dataObj = JSON.parse(e.data)
-            await setMapRegion(dataObj)
+            if (dataObj.action){
+                await setMapRegion(prevState => ({
+                    ...prevState,
+                    status: 'false'
+                }));
+                await console.log('map',mapRegion)
+            }else{
+                await setMapRegion(dataObj)
+            }
 
             if (dataObj.latitude !== null) {
                 await setMapControl(true)
@@ -59,16 +71,16 @@ const AlertsScreen = (props) => {
 
             console.log('message', dataObj);
         };
-        ws.onopen = (e) => {
+        ws.current.onopen = (e) => {
             // a message was received
             console.log('open', e);
             // ws.send(JSON.stringify({msg: 'From savior'}))
         };
-        ws.onerror = (e) => {
+        ws.current.onerror = (e) => {
             // a message was received
             console.log('error', e);
         };
-        ws.onclose = (e) => {
+        ws.current.onclose = (e) => {
             // a message was received
             console.log('close', e);
         };
@@ -82,11 +94,17 @@ const AlertsScreen = (props) => {
             <Text style={[styles.title, {textAlign: 'center', fontWeight: 'bold', paddingBottom: 5,}]}>
                 {name}</Text>
             <View style={styleSheet.Inline}>
-                <MaterialCommunityIcons name="alert" size={24} color="orange"/>
+                {live ?
+                    <Animatable.View animation="fadeIn" easing="ease-in-out" iterationCount="infinite">
+                        <MaterialCommunityIcons name="checkbox-blank-circle" size={24} color="#22ff00"/>
+                    </Animatable.View>
+                    :
+                    <MaterialCommunityIcons name="checkbox-blank-circle" size={24} color={myColors.white}/>
+                }
                 {live ?
                     <Text style={[styles.title, {color: '#22ff00',}]}>Live Now</Text>
                     :
-                    <Text style={styles.title}>Offline</Text>
+                    <Text style={[styles.title]}>Offline</Text>
                 }
                 <Text style={styles.title}>{new Date(Date.parse(date)).toDateString()}</Text>
                 <MaterialCommunityIcons name="alert" size={24} color="orange"/>
@@ -96,30 +114,30 @@ const AlertsScreen = (props) => {
 
     const renderItem = ({item}) => (
         <Item
-            name={item.alert.girl.first_name+' '+item.alert.girl.last_name}
+            name={item.alert.girl.first_name + ' ' + item.alert.girl.last_name}
             date={item.alert.date}
             live={item.alert.is_live}
             alertId={item.alert.uuid}
         />
     );
 
-    useEffect(()=>{
+    useEffect(() => {
+        setIsloading(true);
         getAlerts();
     }, []);
 
     return (
         <SafeAreaView style={styles.container}>
-            {!mapControl ?
-                <FlatList
-                    data={alertData}
-                    renderItem={renderItem}
-                    keyExtractor={item => item.id}
-                />
-                :
-                <View>
+            {mapControl ?
+                <View style={{flex: 1}}>
                     <MapView
-                        style={{alignSelf: 'stretch', height: '100%'}}
-                        region={mapRegion}
+                        style={{ flex: 3}}
+                        region={{
+                            latitude: mapRegion.latitude,
+                            longitude: mapRegion.longitude,
+                            latitudeDelta: mapRegion.latitudeDelta,
+                            longitudeDelta: mapRegion.longitudeDelta
+                        }}
                     >
                         <Marker
                             coordinate={{
@@ -132,16 +150,33 @@ const AlertsScreen = (props) => {
                             pinColor={'#ff4b00'}
                         />
                         <Circle
-                            center={mapRegion}
+                            center={{
+                                latitude: mapRegion.latitude,
+                                longitude: mapRegion.longitude,
+                                latitudeDelta: mapRegion.latitudeDelta,
+                                longitudeDelta: mapRegion.longitudeDelta
+                            }}
                             radius={40}
                             strokeColor={'rgb(0,136,93)'}
                             fillColor={'rgba(0,136,93,0.2)'}
                         />
                     </MapView>
+                    <View style={{padding: 10, flex: 1}}>
+                        <Text style={{fontSize: 30, color:myColors.white}}>{mapRegion.name}</Text>
+                        <Text style={{fontSize: 20, color:myColors.white}}>{mapRegion.date}</Text>
+                        { mapRegion.status === 'true' ?
+                            <Animatable.Text animation="fadeIn" easing="ease-in-out" iterationCount="infinite"
+                                style={{fontSize: 30, color:'#22ff00'}}>Live</Animatable.Text>
+                            :
+                            <Text style={{fontSize: 30, color:myColors.white}}>Offline</Text>
+                        }
+                    </View>
                     <ActionButton
-                        buttonColor={myColors.darkerColor}
+                        buttonColor={myColors.secondColor}
                         onPress={() => {
-                            setMapControl(false)
+                            setMapControl(false);
+                            ws.current.close();
+                            getAlerts();
                         }}
                         renderIcon={active => active ? (
                             <MaterialCommunityIcon name="close-thick" color={myColors.white} size={30}/>) : (
@@ -150,6 +185,20 @@ const AlertsScreen = (props) => {
 
                     </ActionButton>
                 </View>
+                : [
+                    (isLoading ?
+                            <ActivityIndicator/>
+                            :
+                            <FlatList
+                                data={alertData}
+                                renderItem={renderItem}
+                                keyExtractor={item => item.id}
+                                refreshControl={
+                                    <RefreshControl refreshing={isLoading} onRefresh={getAlerts}/>
+                                }
+                            />
+                    )
+                ]
             }
         </SafeAreaView>
     );

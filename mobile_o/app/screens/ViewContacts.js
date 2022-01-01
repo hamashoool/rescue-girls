@@ -194,12 +194,12 @@ const styles = StyleSheet.create({
         padding: 10
     },
     fontSize: {
-        fontSize: 18,
+        fontSize: 16,
         color: myColors.white
     },
     image: {
-        width: 100,
-        height: imgHeight,
+        width: 90,
+        height: 90,
         borderRadius: 50
     },
     wrapText: {

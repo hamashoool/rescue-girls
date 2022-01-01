@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from django.contrib.auth.admin import UserAdmin
 
-from main_app.models import User, Contact, Alert, AlertItem, Location
+from main_app.models import User, Contact, Alert, AlertItem, Location, NotificationToken
 
 
 class UserAdminCustom(UserAdmin):
@@ -22,3 +22,4 @@ admin.site.register(Contact)
 admin.site.register(Alert)
 admin.site.register(AlertItem)
 admin.site.register(Location)
+admin.site.register(NotificationToken)

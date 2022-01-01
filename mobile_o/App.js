@@ -31,7 +31,7 @@ export default function App() {
         registrationUrl: 'http://192.168.0.90:8000/api/registration/',
         loginUrl: 'http://192.168.0.90:8000/api/login/',
         apiUrl: 'http://192.168.0.90:8000/api/',
-        getUserUrl: 'http://192.168.0.90:8000/api/user/',
+        tokenUrl: 'http://192.168.0.90:8000/api/create/notification/token/',
         search: 'http://192.168.0.90:8000/api/search/?search=osman'
     };
     let [fontLoaded, error] = useFonts({Playball_400Regular});
@@ -186,31 +186,15 @@ export default function App() {
             setRegistrationValid(true);
         },
     }), []);
-    const getUser = async (userToken) => {
-        fetch(getUserUrl, {
+    const createNotificationToken = async (token) => {
+        await fetch(urls.tokenUrl, {
             method: 'POST', headers: {
-                Accept: 'application/json', 'Content-Type': 'application/json', 'Authorization': 'Token ' + userToken
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Token ' + userInfo.token
             }, body: JSON.stringify({
-                token: userToken,
+                token: token,
             })
-        }).then((response) => response.json()).then(async (json) => {
-            if (json.error) {
-                alert('Invalid Login Information.');
-                console.log(json);
-            }
-            if (json.name) {
-                try {
-                    setUserInfo(prevState => {
-                        return {
-                            ...prevState, name: json.name, token: userToken,
-                        };
-                    });
-                } catch (error) {
-                    console.log(error);
-                }
-            }
-        }).catch((error) => {
-            console.error(error);
         });
     }
     const registerForPushNotificationsAsync = async () => {
@@ -226,7 +210,7 @@ export default function App() {
                 return;
             }
             const token = (await Notifications.getExpoPushTokenAsync()).data;
-            console.log(token);
+            await createNotificationToken(token);
             await SecureStore.setItemAsync('notiToken', token);
         } else {
             alert('Must use physical device for Push Notifications');
@@ -241,7 +225,7 @@ export default function App() {
             });
         }
     };
-    const notificationListener = useRef();
+
     useEffect(async () => {
         let userToken = null; let userName = null; let email = null;
         let Name = null; let userType = null; let notiToken = null;
@@ -281,10 +265,6 @@ export default function App() {
             if (!notiToken) {
                 await registerForPushNotificationsAsync();
             }
-            // notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-            //     // setNotification(notification);
-            //     // console.log(notification);
-            // });
             Notifications.setNotificationHandler({
                 handleNotification: async () => ({
                     shouldShowAlert: true,

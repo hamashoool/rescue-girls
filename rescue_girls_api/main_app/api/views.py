@@ -16,7 +16,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from main_app.api.serializers import UserSerializer, RegistrationSerializer, ContactSerializer, AlertSerializer, \
     LocationSerializer, AlertItemSerializer, LocationCoordsSerializer
-from main_app.models import User, Contact, Alert, AlertItem, Location
+from main_app.models import User, Contact, Alert, AlertItem, Location, NotificationToken
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -169,6 +169,27 @@ def delete_savior(request):
     return Response(data)
 
 
+# it will return 'error' or 'success' since it is deleting contact object
+@api_view(['POST'])
+@permission_classes((permissions.IsAuthenticated,))
+def delete_alert(request):
+    data = {}
+    if request.method == 'POST':
+        alert_id = request.data['alert_id']
+        try:
+            alert = Alert.objects.get(uuid=str(alert_id))
+            for al in Alert.objects.filter(girl=alert.girl):
+                if al.is_live:
+                    al.is_live = False
+                    al.save()
+            alert.delete()
+            data['success'] = 'Alert has been deleted.'
+            return Response(data)
+        except ObjectDoesNotExist:
+            data['error'] = 'This alert does not exist.'
+    return Response(data)
+
+
 # it will return 'error' or 'success' since it is creating alert object
 @api_view(['POST'])
 @permission_classes((permissions.IsAuthenticated,))
@@ -221,3 +242,24 @@ def get_alerts(request):
         alert_items = AlertItem.objects.filter(savior=request.user).order_by('-alert__date')
         data = AlertItemSerializer(alert_items, many=True).data
         return Response(data)
+
+
+# it will return list of alert objects
+@api_view(['POST'])
+@permission_classes((permissions.IsAuthenticated,))
+def create_notification_token(request):
+    if request.method == 'POST':
+        if not request.user.is_savior:
+            data = {'error': 'You are not savior.'}
+            return Response(data)
+
+        token = request.data['token']
+        user = request.user
+        notification_token = NotificationToken.objects.get(user=user)
+
+        if notification_token.token is None:
+            notification_token.token = token
+            notification_token.save()
+
+        return Response({'success': 'Done'})
+
