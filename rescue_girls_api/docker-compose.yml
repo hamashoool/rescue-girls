@@ -1,0 +1,32 @@
+version: "3.8"
+services:
+  # redis
+  redis:
+    image: hamashool/redis:alpine
+    container_name: redis_container
+
+  # database
+  db:
+    image: hamashool/postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    container_name: POSTGRES_DB
+    ports:
+      - 5432:5432
+
+      # django application
+  app:
+    build: .
+    volumes:
+      - .:/django
+    ports:
+      - 80:80
+    image: hamashool/app:django
+    container_name: django_container
+    command: daphne -b 0.0.0.0 -p 80 rescue_girls_api.asgi:application
+    depends_on:
+      - db

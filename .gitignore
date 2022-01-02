@@ -3,3 +3,5 @@
 /rescue_girls_api/db.sqlite3
 .idea
 *.pyc
+.env
+data/
