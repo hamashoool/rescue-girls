@@ -20,3 +20,5 @@ jobs:
     # Runs a single command using the runners shell
     - name: Send greeting
       run: echo "Hello ${{ github.event.inputs.name }}"
+    - name: cloning the code
+      run: git clone https://github.com/hamashoool/rescue-girls.git
