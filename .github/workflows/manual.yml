@@ -22,7 +22,5 @@ jobs:
       run: echo "Hello ${{ github.event.inputs.name }}"
     - name: Changing Directory
       run: cd /home/ubuntu/actions-runner/rescue_girls_work/rescue-girls/rescue-girls/rescue-girls/rescue_girls_api && git pull
-#    - name: Building
-#      run: cd /home/ubuntu/actions-runner/rescue_girls_work/rescue-girls/rescue-girls/rescue-girls/rescue_girls_api && sudo docker build .
-#    - name: Rerunning The App
-#      run: cd /home/ubuntu/actions-runner/rescue_girls_work/rescue-girls/rescue-girls/rescue-girls/rescue_girls_api && sudo docker-compose up
+    - name: Rerunning The App
+      run: cd /home/ubuntu/actions-runner/rescue_girls_work/rescue-girls/rescue-girls/rescue-girls/rescue_girls_api && sudo docker-compose build --no-cache && sudo docker-compose up -d --force-recreate
