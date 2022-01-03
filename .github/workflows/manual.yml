@@ -11,7 +11,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "greet"
-  greet:
+  Deployment:
     # The type of runner that the job will run on
     runs-on: self-hosted
 
@@ -20,5 +20,7 @@ jobs:
     # Runs a single command using the runners shell
     - name: Send greeting
       run: echo "Hello ${{ github.event.inputs.name }}"
-    - name: Updating the code
+    - name: Changing Directory
+      run: cd /home/ubuntu/actions-runner/rescue_girls_work/rescue-girls/rescue-girls/rescue-girls/rescue_girls_api
+    - name: Updating the Code
       run: git pull
