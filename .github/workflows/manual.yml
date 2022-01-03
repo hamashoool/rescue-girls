@@ -21,6 +21,6 @@ jobs:
     - name: Send greeting
       run: echo "Hello ${{ github.event.inputs.name }}"
     - name: Changing Directory
-      run: cd /home/ubuntu/actions-runner/rescue_girls_work/rescue-girls/rescue-girls/rescue-girls/rescue_girls_api
-    - name: Updating the Code
-      run: git pull
+      run: cd /home/ubuntu/actions-runner/rescue_girls_work/rescue-girls/rescue-girls/rescue-girls/rescue_girls_api && git pull
+#    - name: Updating the Code
+#      run: git pull
