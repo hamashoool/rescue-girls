@@ -27,7 +27,8 @@ services:
       - 80:80
     image: app:django
     container_name: django_container
-#    command: python manage.py collectstatic
+    command: python manage.py collectstatic
+    command: python manage.py makemigrations %% python manage.py migrate
     command: daphne -b 0.0.0.0 -p 80 rescue_girls_api.asgi:application
     depends_on:
       - db
