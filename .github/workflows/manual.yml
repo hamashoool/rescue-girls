@@ -22,7 +22,7 @@ jobs:
       run: echo "Hello ${{ github.event.inputs.name }}"
 #    - name: Cloning
 #      run: git clone https://github.com/hamashoool/rescue-girls.git
-#    - name: Changing Directory
-#      run: cd /home/ubuntu/actions-runner/rescue_girls_work/rescue-girls/rescue-girls/rescue-girls/rescue_girls_api && git pull
+    - name: Changing Directory
+      run: cd /home/ubuntu/actions-runner/_work/rescue-girls/rescue-girls/rescue-girls && git pull
 #    - name: Rerunning The App
 #      run: cd /home/ubuntu/actions-runner/rescue_girls_work/rescue-girls/rescue-girls/rescue-girls/rescue_girls_api && sudo docker-compose build --no-cache && sudo docker-compose up -d --force-recreate
