@@ -20,8 +20,8 @@ jobs:
     # Runs a single command using the runners shell
     - name: Send greeting
       run: echo "Hello ${{ github.event.inputs.name }}"
-    - name: Cloning
-      run: git clone https://github.com/hamashoool/rescue-girls.git
+#    - name: Cloning
+#      run: git clone https://github.com/hamashoool/rescue-girls.git
 #    - name: Changing Directory
 #      run: cd /home/ubuntu/actions-runner/rescue_girls_work/rescue-girls/rescue-girls/rescue-girls/rescue_girls_api && git pull
 #    - name: Rerunning The App
