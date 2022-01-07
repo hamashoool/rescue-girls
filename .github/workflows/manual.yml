@@ -18,8 +18,10 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - name: Updating the repository
-      run: cd /home/ubuntu/actions-runner/_work/rescue-girls/rescue-girls/rescue-girls && git pull
+      run: cd && ./up.sh
     - name: Updating the dependencies
       run: cd && ./ur.sh
     - name: Updating the database
-      run: cd /home/ubuntu/actions-runner/_work/rescue-girls/rescue-girls/rescue-girls/rescue_girls_api && python manage.py makemigrations && python manage.py migrate
+      run: cd && ./ud.sh
+    - name: Restart the servers
+      run: cd && ./rs.sh
