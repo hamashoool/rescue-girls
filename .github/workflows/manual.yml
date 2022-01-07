@@ -22,5 +22,4 @@ jobs:
     - name: Updating the dependencies
       run: cd && ./ur.sh
     - name: Updating the database
-      run: cd /home/ubuntu/actions-runner/_work/rescue-girls/rescue-girls/rescue-girls/rescue_girls_api && py manage.py makemigrations && py manage.py migrate
-    
+      run: cd /home/ubuntu/actions-runner/_work/rescue-girls/rescue-girls/rescue-girls/rescue_girls_api && python manage.py makemigrations && python manage.py migrate
