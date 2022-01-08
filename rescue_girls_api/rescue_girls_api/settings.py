@@ -28,6 +28,7 @@ SECRET_KEY = env('SECURITY_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = ['https://*.rescue-girls.online', 'https://*.127.0.0.1']
 
 # Application definition
 
