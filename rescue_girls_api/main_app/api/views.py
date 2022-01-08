@@ -263,3 +263,20 @@ def create_notification_token(request):
 
         return Response({'success': 'Done'})
 
+
+# it will return list of alert objects
+@api_view(['GET'])
+@permission_classes((permissions.IsAuthenticated,))
+def get_notification_tokens(request):
+    data = {}
+    if request.method == 'GET':
+        if not request.user.is_girl:
+            data = {'error': 'You are not female.'}
+            return Response(data)
+
+        contact = Contact.objects.get(user=request.user)
+        people = contact.people.all()
+        for person in people:
+            noti_token = NotificationToken.objects.get(user=person).token
+            data[f'{person.username}'] = str(noti_token)
+    return Response(data)

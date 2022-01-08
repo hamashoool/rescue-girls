@@ -15,6 +15,7 @@ urlpatterns = [
     path('delete/alert/', views.delete_alert),
     path('get/alerts/', views.get_alerts),
     path('get/contacts/', views.get_contacts),
+    path('get/notification/tokens/', views.get_notification_tokens),
     path('login/', views.login_view),
     path('registration/', views.registration_view),
     path('search/', views.Search.as_view()),
