@@ -264,7 +264,7 @@ def create_notification_token(request):
         return Response({'success': 'Done'})
 
 
-# it will return list of alert objects
+# it will return list of notification_tokens for on female
 @api_view(['GET'])
 @permission_classes((permissions.IsAuthenticated,))
 def get_notification_tokens(request):
@@ -277,6 +277,25 @@ def get_notification_tokens(request):
         contact = Contact.objects.get(user=request.user)
         people = contact.people.all()
         for person in people:
-            noti_token = NotificationToken.objects.get(user=person).token
-            data[f'{person.username}'] = str(noti_token)
+            try:
+                noti_token = NotificationToken.objects.get(user=person).token
+                data[f'{person.username}'] = str(noti_token)
+            except:
+                pass
+    return Response(data)
+
+
+# it will return savior dashboard data
+@api_view(['GET'])
+@permission_classes((permissions.IsAuthenticated,))
+def get_savior_dashboard_data(request):
+    data = {}
+    if request.method == 'GET':
+        if not request.user.is_savior:
+            data = {'error': 'You are not saving.'}
+            return Response(data)
+
+        contact = Contact.objects.get(user=request.user)
+        total_contacts = contact.people.all().count()
+        print(total_contacts)
     return Response(data)
