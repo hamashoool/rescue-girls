@@ -1,4 +1,7 @@
+import datetime
 import json
+import calendar
+from datetime import datetime as dt
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
@@ -291,11 +294,28 @@ def get_notification_tokens(request):
 def get_savior_dashboard_data(request):
     data = {}
     if request.method == 'GET':
-        if not request.user.is_savior:
-            data = {'error': 'You are not saving.'}
-            return Response(data)
+        if request.user.is_savior:
+            total_alert = AlertItem.objects.filter(savior=request.user).count()
+            alert_count = []
 
+            this_year = dt.today().year
+            for m in range(12):
+                last_month_day = calendar.monthrange(this_year, m + 1)[1]
+                first_day = dt.today().replace(month=m + 1, day=1).date()
+                last_day = dt.today().replace(month=m + 1, day=last_month_day).date()
+
+                alerts = AlertItem.objects.filter(savior=request.user, alert__date__gte=first_day, alert__date__lt=last_day)
+                if alerts.count() > 0:
+                    alert_count.append(alerts.count())
+                else:
+                    alert_count.append(0)
+        else:
+            total_alert = Alert.objects.filter(girl=request.user).count()
+            alert_count = 0
         contact = Contact.objects.get(user=request.user)
         total_contacts = contact.people.all().count()
-        print(total_contacts)
+
+        data['alerts'] = total_alert
+        data['contacts'] = total_contacts
+        data['alert_count'] = alert_count
     return Response(data)
